@@ -403,7 +403,7 @@
 
   <div class="card theorypanel" id="theoryPanel" style="display:none">
     <div class="thead">
-      <span class="tnav" id="thPage">1 / 5</span>
+      <span class="tnav" id="thPage">1 / 13</span>
       <span>📖 你的聲音是怎麼搭起來的</span>
     </div>
     <div class="tcard">
@@ -821,11 +821,40 @@ const THEORY=[
    song:"seasons 的 Gmaj7→Gm6、Dreamer 一樣、My Love 的 D→Dm、Bruno Major〈Home〉、方大同〈才二十三〉(你 #1 重播,同一招低一個全音!)。這是你最常被電到的一招。",
    plays:[ {label:"🔊 Gmaj7(亮)", spell:"G B D F♯", notes:[55,59,62,66], mode:"chord"},
            {label:"🔊 → Gm6(暗一下 = 嘆氣)", spell:"G B♭ D E", notes:[55,58,62,64], mode:"chord"} ] },
+ { sym:"1 · ♭3 · 5 · 6", t:"m6:暗,但不死",
+   body:"純小三和弦 = 全暗。m6 多疊一個第 6 音——那顆 6 讓它「苦中帶甜、漂浮、沒完全沉下去」。所以 seasons 的嘆氣是「融化」不是「悲傷」:它借了小調的暗,又留了一點甜。你之前自己抓到的「Gm6 跟 Gmaj7 差兩個音」,那第二個音(E)就是這顆 6。",
+   song:"seasons / Dreamer 的 Gm6、才二十三 的 Fm6——你的嘆氣全是 m6,不是純小調。",
+   plays:[ {label:"🔊 G 小(全暗)", spell:"G B♭ D", notes:[55,58,62], mode:"chord"},
+           {label:"🔊 → Gm6(暗+一點甜)", spell:"G B♭ D E", notes:[55,58,62,64], mode:"chord"} ] },
  { sym:"1 · 3 · 5 · ♭7", t:"屬七 = 想往前的力",
    body:"把 maj7 的第 7 音再降半音(C♯→C)= 屬7。一樣只動「一個音」,但它不甜了,變「癢、想解決、往前推」。流行/爵士一半的動力來自這個「想走」。",
    song:"seasons 第一→第二個和弦,就是 maj7→屬7(Dmaj7→D7)。這就是你聽辨分不太出來的那兩個——現在你有對照了。",
    plays:[ {label:"🔊 Dmaj7(甜、停住)", spell:"D F♯ A C♯", notes:[50,54,57,61], mode:"chord"},
            {label:"🔊 → D7(癢、想走)", spell:"D F♯ A C", notes:[50,54,57,60], mode:"chord"} ] },
+ { sym:"V7 / IV", t:"次屬:seasons 的 D7 有秘密身份",
+   body:"D 大調裡,D7 本來不是家人(C 不在 D 大調)。它其實是「借來指路的箭頭」:D7 = G 的屬七(V7/IV),整個和弦在喊「我要去 G!」。所以 seasons 的 Dmaj7→D7→Gmaj7,那個 D7 是橋——先變癢,再解決到 G,你聽起來才那麼順。這招叫次屬和弦(secondary dominant)。",
+   song:"seasons 的 D7→Gmaj7、My Love 的 C♯7、Mr. Sandman 整首就是次屬接龍。",
+   plays:[ {label:"🔊 Dmaj7 → Gmaj7(直接走,平)", spell:"沒有箭頭", chords:[[50,54,57,61],[55,59,62,66]]},
+           {label:"🔊 D7 → Gmaj7(先癢再解決,順!)", spell:"D7 = V7/IV,指著 G 的箭頭", chords:[[50,54,57,60],[55,59,62,66]]} ] },
+ { sym:"ii → V → I", t:"ii–V–I:爵士的回家路",
+   body:"流行常直接 V→I 回家;爵士多走一步:ii→V→I,「準備→推→到家」。三步的低音剛好繞五度圈(E→A→D),所以特別滑順。你 jazz-pop 群的歌幾乎都靠這條路回家。聽看看:走兩步再到家,是不是比直接到家更「圓」?",
+   song:"Goddess(Gm7–C7–Fmaj7)、Easily、Dean Martin〈Everybody Loves Somebody〉、Just the Two of Us 的下行 ii–V 鏈。",
+   plays:[ {label:"🔊 V → I(直接回家)", spell:"A7 → Dmaj7", chords:[[57,61,64,67],[50,54,57,61]]},
+           {label:"🔊 ii → V → I(繞個彎更圓)", spell:"Em7 → A7 → Dmaj7", chords:[[52,55,59,62],[57,61,64,67],[50,54,57,61]]} ] },
+ { sym:"A → E/G♯ → F♯m7", t:"低音走樓梯:和弦的斜線是什麼",
+   body:"「E/G♯」唸作「E over G♯」:上面彈 E 和弦,但最低音改彈 G♯。為什麼?為了讓低音走樓梯:A→G♯→F♯…一階一階下。和弦在換,低音卻在「走路」,歌就有了重力方向。這叫轉位(inversion)。看到斜線和弦別怕——它只是在指定低音。",
+   song:"Daniel Caesar〈Always〉開頭就是 A→E/G♯→F♯m7→D,低音 A→G♯→F♯ 下樓梯。",
+   plays:[ {label:"🔊 Always 開頭(聽最低音下樓梯)", spell:"A → E/G♯ → F♯m7 → D", chords:[[45,57,61,64],[44,56,59,64],[42,54,57,64],[50,54,57,62]]} ] },
+ { sym:"1·3·5·7 · 9", t:"maj9:甜上加甜(R&B 的天花板)",
+   body:"maj7 再往上疊一個 9(= 高八度的第 2 音)= maj9。更厚、更霧、更「夢裡」。R&B/soul 的招牌色——和弦疊得越高,離地越遠。方大同〈才二十三〉原曲開頭就是 E♭maj9。你遊戲裡唱的是 maj7 簡化版;耳朵先認得這個甜,以後吉他再疊上去。",
+   song:"方大同〈才二十三〉(E♭maj9)、Daniel Caesar、Bruno Major——你 R&B 軸的全部。",
+   plays:[ {label:"🔊 Cmaj7(甜)", spell:"C E G B", notes:[48,52,55,59], mode:"chord"},
+           {label:"🔊 → Cmaj9(甜上加甜)", spell:"C E G B D", notes:[48,52,55,59,62], mode:"chord"} ] },
+ { sym:"D 大 ↔ B 小", t:"關係小調:同一把音,兩個家",
+   body:"D 大調和 B 小調用「一模一樣的七個音」,差別只在「哪個音是家」:回到 D = 明亮的家;回到 B = 憂鬱的家。這叫關係小調(relative minor)。注意跟第 4 章分清楚:「平行」= 同根音不同音(D大↔D小,借和弦用);「關係」= 同一把音不同家(D大↔B小,換心情用)。",
+   song:"你聽辨裡的 vi–IV–I–V(憂鬱流行)就是讓 vi 當家。blue 的 Royal Road 也在玩這個影子。",
+   plays:[ {label:"🔊 同一把音,回到 D = 亮的家", spell:"D E F♯ G A B C♯ → D", notes:[50,52,54,55,57,59,61,62], mode:"melody"},
+           {label:"🔊 同一把音,回到 B = 暗的家", spell:"B C♯ D E F♯ G A → B", notes:[47,49,50,52,54,55,57,59], mode:"melody"} ] },
  { sym:"I · IV · V …", t:"度數食譜:羅馬數字 = 換調自由",
    body:"和弦用「在音階第幾度」命名(I、IV、V…),大寫=大三、小寫=小三。記度數、不記和弦名,就能把同一首歌搬到任何適合你嗓子的調。",
    song:"seasons = Imaj7–I7–IVmaj7–iv6。Dreamer 跟它「同一招」,就是因為度數一樣(Imaj7→IVmaj7→iv6),只是音不同。",
