@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PITCH BARD · 練唱</title>
+<meta name="description" content="PITCH BARD — AJ 的黑白塗鴉練唱 RPG:跟著唱、自由鏡、聽辨、樂理講解。" />
+<meta name="theme-color" content="#faf8f3" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='3' y='3' width='58' height='58' rx='14' fill='%23faf8f3' stroke='%2316150f' stroke-width='4'/%3E%3Ctext x='32' y='47' font-size='40' text-anchor='middle' fill='%2316150f' font-family='Georgia'%3E%E2%99%AA%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #faf8f3; --ink: #16150f; --ink2: #5b584c; --grey: #d6d2c7; --hair: #c9c5b8;
+    --display: "Bricolage Grotesque", "PingFang TC", system-ui, sans-serif;
+    --mono: "Space Mono", "SFMono-Regular", ui-monospace, Menlo, monospace;
+    --sans: -apple-system, "PingFang TC", "Helvetica Neue", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-font-smoothing: antialiased; }
+  body {
+    position: relative; min-height: 100vh; color: var(--ink); background: var(--paper); font-family: var(--sans);
+    display: flex; flex-direction: column; align-items: center; padding: 28px 16px 60px; gap: 16px;
+  }
+  /* paper grain */
+  body::before { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.5; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.04'/%3E%3C/svg%3E"); }
+  .wrap { position: relative; z-index: 1; width: 100%; max-width: 880px; display: flex; flex-direction: column; gap: 16px; }
+  .wrap > * { animation: rise .6s cubic-bezier(.2,.75,.2,1) both; }
+  .wrap > *:nth-child(2){animation-delay:.06s} .wrap > *:nth-child(3){animation-delay:.12s}
+  .wrap > *:nth-child(4){animation-delay:.18s} .wrap > *:nth-child(n+5){animation-delay:.24s}
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; }
+  h1 { font-family: var(--display); font-weight: 800; font-size: 30px; letter-spacing: -.5px; line-height: .95; }
+  .kicker { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink2); margin-bottom: 8px; }
+  .sub { font-family: var(--mono); color: var(--ink2); font-size: 11.5px; margin-top: 7px; letter-spacing: .3px; }
+  select { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 11px; padding: 9px 13px; font-size: 13px; font-family: var(--mono); cursor: pointer; }
+
+  .modebar { display: flex; gap: 9px; }
+  .modebtn { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 999px; padding: 8px 20px; font-size: 13px; font-family: var(--mono); font-weight: 700; cursor: pointer; transition: .14s; }
+  .modebtn.active { background: var(--ink); color: var(--paper); }
+
+  .card { background: #fffefb; border: 2px solid var(--ink); border-radius: 18px; box-shadow: 6px 7px 0 -2px rgba(22,21,15,0.12), 11px 13px 0 -4px rgba(22,21,15,0.07); }
+  .readout { display: grid; grid-template-columns: 168px 1fr; gap: 18px; align-items: center; padding: 16px 20px; }
+  @media (max-width: 560px) { .readout { grid-template-columns: 1fr; text-align: center; } }
+  .note-big { font-family: var(--mono); font-size: 50px; font-weight: 700; line-height: 1; color: var(--grey); letter-spacing: -2px; transition: color .12s; }
+  .note-big.live { color: var(--ink); }
+  .hz { font-family: var(--mono); color: var(--ink2); font-size: 11.5px; margin-top: 7px; letter-spacing: .5px; }
+  .cents-label { display: flex; justify-content: space-between; color: var(--ink2); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; font-family: var(--mono); }
+  .cents-bar { position: relative; height: 16px; background: var(--paper); border: 2px solid var(--ink); border-radius: 9px; overflow: hidden; }
+  .cents-green { position: absolute; left: 42%; width: 16%; top: 0; bottom: 0; background: repeating-linear-gradient(45deg, rgba(22,21,15,0.10) 0 4px, transparent 4px 8px); border-left: 1px solid var(--ink); border-right: 1px solid var(--ink); }
+  .cents-marker { position: absolute; top: -2px; bottom: -2px; width: 4px; background: var(--ink); left: 50%; border-radius: 2px; transition: left .06s linear; }
+  .cents-marker.intune { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--ink); }
+  .verdict { margin-top: 9px; font-size: 12px; color: var(--ink2); min-height: 18px; font-family: var(--mono); letter-spacing: .3px; }
+  .verdict.intune { color: var(--ink); font-weight: 700; }
+
+  .stage { position: relative; }
+  canvas { width: 100%; height: 320px; background: #fffefb; border: 2px solid var(--ink); border-radius: 18px; display: block; box-shadow: 6px 7px 0 -2px rgba(22,21,15,0.12); }
+  .endscreen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 9px; background: rgba(250,248,243,0.93); border-radius: 18px; }
+  .endscreen.show { display: flex; animation: pop .3s cubic-bezier(.2,.8,.2,1); }
+  @keyframes pop { from { transform: scale(.93); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .grade { font-family: var(--display); font-size: 92px; font-weight: 800; line-height: 1; }
+  .endstat { font-family: var(--mono); font-size: 14px; } .endstat b { font-weight: 700; }
+  .endmsg { font-family: var(--mono); font-size: 12px; color: var(--ink2); max-width: 36ch; text-align: center; line-height: 1.6; }
+  .endbtns { display: flex; gap: 11px; margin-top: 8px; }
+  .endbtns button { border: 2px solid var(--ink); border-radius: 999px; padding: 11px 24px; font-size: 14px; font-weight: 700; font-family: var(--mono); cursor: pointer; transition: transform .12s; }
+  .endbtns button:hover { transform: translateY(-1px); }
+  .endbtns .again { background: var(--ink); color: var(--paper); } .endbtns .other { background: var(--paper); color: var(--ink); }
+
+  .scorebar { display: flex; gap: 26px; align-items: baseline; flex-wrap: wrap; padding: 4px 8px; }
+  .scorebar .blk { display: flex; flex-direction: column; gap: 2px; }
+  .scorebar .v { font-family: var(--mono); font-weight: 700; transition: transform .1s cubic-bezier(.3,1.6,.5,1); display: inline-block; }
+  .scorebar .score .v { font-size: 34px; letter-spacing: -1px; }
+  .scorebar .v.small { font-size: 21px; }
+  .scorebar .mult { font-family: var(--display); font-weight: 800; font-size: 18px; }
+  .scorebar .l { font-size: 10px; color: var(--ink2); letter-spacing: 1.5px; text-transform: uppercase; font-family: var(--mono); }
+
+  .gamebar { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; padding: 13px 17px; }
+  .gamebar .grp { display: flex; gap: 9px; align-items: center; font-size: 12px; font-family: var(--mono); color: var(--ink2); text-transform: uppercase; letter-spacing: .5px; }
+  .bpm { display: flex; align-items: center; gap: 7px; }
+  .bpm button { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); font-size: 15px; cursor: pointer; line-height: 1; }
+  .bpm b { font-family: var(--mono); width: 34px; text-align: center; display: inline-block; color: var(--ink); font-size: 15px; }
+  .toggle { display: flex; align-items: center; gap: 6px; color: var(--ink2); font-size: 12px; font-family: var(--mono); cursor: pointer; user-select: none; text-transform: uppercase; letter-spacing: .5px; }
+  .toggle input { accent-color: var(--ink); width: 14px; height: 14px; }
+  .go-btn { background: var(--ink); color: var(--paper); font-family: var(--mono); font-weight: 700; border: 2px solid var(--ink); border-radius: 999px; padding: 11px 24px; font-size: 14px; cursor: pointer; margin-left: auto; transition: transform .12s; letter-spacing: 1px; }
+  .go-btn:hover { transform: translateY(-1px); }
+  .go-btn.stop { background: var(--paper); color: var(--ink); }
+
+  .controls { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; justify-content: center; margin-top: 2px; }
+  .mic-btn { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 999px; padding: 12px 26px; font-size: 14px; font-family: var(--mono); font-weight: 700; cursor: pointer; transition: .14s; letter-spacing: .5px; }
+  .mic-btn.on { background: var(--ink); color: var(--paper); }
+  .range-box { display: flex; gap: 8px; align-items: center; color: var(--ink2); font-size: 12px; font-family: var(--mono); text-transform: uppercase; letter-spacing: .5px; }
+  .range-box b { color: var(--ink); font-size: 14px; }
+  .range-box button { background: var(--paper); color: var(--ink2); border: 2px solid var(--ink); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-family: var(--mono); cursor: pointer; }
+  .status { text-align: center; font-size: 12px; min-height: 20px; color: var(--ink2); font-family: var(--mono); letter-spacing: .5px; }
+  .status::before { content: "> "; }
+  .status.err { color: #a13a2a; }
+  .tips { font-family: var(--mono); color: var(--ink2); font-size: 11.5px; line-height: 1.8; padding: 14px 18px; }
+  .tips b { color: var(--ink); } .cur { animation: blink 1s steps(1) infinite; } @keyframes blink { 50% { opacity: 0; } }
+
+  /* lesson deck (Slice 2) */
+  .lessondeck { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; padding: 16px; background: rgba(250,248,243,0.97); border-radius: 18px; }
+  .lessondeck.show { display: flex; animation: pop .3s cubic-bezier(.2,.8,.2,1); }
+  .deckwrap { width: 100%; max-width: 580px; display: flex; flex-direction: column; gap: 12px; }
+  .decknav { display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 12px; color: var(--ink2); }
+  .dpage { letter-spacing: 2px; font-weight: 700; }
+  .dskip { background: none; border: none; font-family: var(--mono); font-size: 11px; color: var(--ink2); cursor: pointer; letter-spacing: 1.5px; }
+  .dskip:hover { color: var(--ink); }
+  .dcard { background: #fffefb; border: 2px solid var(--ink); border-radius: 16px; padding: 22px 24px; min-height: 168px; box-shadow: 6px 7px 0 -2px rgba(22,21,15,0.16), 11px 13px 0 -4px rgba(22,21,15,0.09); }
+  .dtag { font-family: var(--mono); font-size: 11px; letter-spacing: 1.5px; color: var(--ink2); }
+  .dtitle { font-family: var(--display); font-weight: 800; font-size: 25px; line-height: 1.1; margin: 9px 0 13px; }
+  .dbody { font-family: var(--mono); font-size: 13px; line-height: 1.9; color: var(--ink); }
+  .dctrl { display: flex; align-items: center; gap: 10px; }
+  .dprev, .dnext { border: 2px solid var(--ink); background: var(--paper); color: var(--ink); border-radius: 999px; padding: 9px 18px; font-family: var(--mono); font-weight: 700; font-size: 13px; cursor: pointer; }
+  .dprev:hover, .dnext:hover { background: var(--ink); color: var(--paper); }
+  .dready { margin-left: auto; background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: 999px; padding: 10px 22px; font-family: var(--mono); font-weight: 700; font-size: 13px; cursor: pointer; letter-spacing: 1px; }
+
+  /* Bard chip + level screen (Slice 3) */
+  .bardchip { display: flex; align-items: center; gap: 10px; width: 100%; background: var(--paper); border: 2px solid var(--ink); border-radius: 999px; padding: 8px 16px; font-family: var(--mono); font-size: 13px; cursor: pointer; transition: .15s; }
+  .bardchip:hover { background: #f2efe7; }
+  .bardchip.ready { animation: chippulse 1.1s ease-in-out infinite; }
+  @keyframes chippulse { 50% { transform: translateY(-1px); box-shadow: 0 4px 0 -1px rgba(22,21,15,0.25); } }
+  .bc-ic { font-size: 16px; } .bc-lv { font-weight: 700; } .bc-title { color: var(--ink2); }
+  .bc-xpbar { flex: 1; height: 9px; background: #e7e3d8; border: 1.5px solid var(--ink); border-radius: 6px; overflow: hidden; }
+  .bc-xpbar i { display: block; height: 100%; width: 0%; background: var(--ink); transition: width .5s cubic-bezier(.2,.8,.2,1); }
+  .bc-streak { font-weight: 700; } .bc-go { color: var(--ink2); font-size: 11px; letter-spacing: 1px; }
+
+  .bardscreen { position: fixed; inset: 0; z-index: 60; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(250,248,243,0.7); backdrop-filter: blur(3px); }
+  .bardscreen.show { display: flex; animation: pop .3s cubic-bezier(.2,.8,.2,1); }
+  .bs-card { width: 100%; max-width: 380px; background: #fffefb; border: 2px solid var(--ink); border-radius: 22px; padding: 20px 24px 26px; text-align: center; box-shadow: 8px 10px 0 -2px rgba(22,21,15,0.16), 15px 18px 0 -5px rgba(22,21,15,0.09); }
+  .bs-top { display: flex; justify-content: space-between; align-items: center; }
+  .bs-kicker { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--ink2); }
+  .bs-close { background: none; border: 2px solid var(--ink); border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 11px; line-height: 1; }
+  .bs-char { display: flex; justify-content: center; margin: 8px 0 2px; }
+  .bs-char.pulse { animation: bardpop .6s cubic-bezier(.2,1.6,.4,1); }
+  @keyframes bardpop { 0% { transform: scale(.8) rotate(-5deg); } 55% { transform: scale(1.13) rotate(4deg); } 100% { transform: scale(1); } }
+  .bs-name { font-family: var(--display); font-weight: 800; font-size: 30px; line-height: 1; }
+  .bs-lv { font-family: var(--mono); font-size: 13px; color: var(--ink2); margin-top: 5px; }
+  .bs-xpbar { height: 16px; background: #e7e3d8; border: 2px solid var(--ink); border-radius: 9px; overflow: hidden; margin: 14px 0 5px; }
+  .bs-xpbar i { display: block; height: 100%; width: 0%; background: var(--ink); transition: width .6s cubic-bezier(.2,.8,.2,1); }
+  .bs-xprange { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10.5px; color: var(--ink2); letter-spacing: .5px; }
+  .bs-levelup { width: 100%; margin: 16px 0 4px; background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: 999px; padding: 13px; font-family: var(--mono); font-weight: 700; font-size: 14px; letter-spacing: 2px; cursor: pointer; transition: .15s; }
+  .bs-levelup:disabled { opacity: .28; cursor: not-allowed; }
+  .bs-levelup.ready { animation: lvready 1s ease-in-out infinite; }
+  @keyframes lvready { 50% { transform: scale(1.03); box-shadow: 0 0 0 3px var(--paper), 0 0 0 6px var(--ink); } }
+  .bs-stats { display: flex; justify-content: space-around; margin: 18px 0 4px; }
+  .bs-stats div { display: flex; flex-direction: column; gap: 3px; }
+  .bs-stats b { font-family: var(--mono); font-size: 22px; }
+  .bs-stats span { font-size: 10px; color: var(--ink2); letter-spacing: .5px; }
+  .bs-ms { font-family: var(--mono); font-size: 11.5px; color: var(--ink2); line-height: 1.6; margin-top: 8px; min-height: 16px; }
+
+  /* ear training (聽辨) */
+  .earpanel { padding: 18px 20px; flex-direction: column; gap: 14px; }
+  .earhead { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .earhead .grp { font-family: var(--mono); font-size: 12px; color: var(--ink2); text-transform: uppercase; letter-spacing: .5px; display: flex; gap: 8px; align-items: center; }
+  .earstats { font-family: var(--mono); font-size: 12px; color: var(--ink2); } .earstats b { color: var(--ink); font-size: 15px; }
+  .earstage { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 22px 10px; border: 2px dashed var(--hair); border-radius: 14px; }
+  .earprompt { font-family: var(--display); font-weight: 800; font-size: 22px; text-align: center; line-height: 1.2; }
+  .ear-replay { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 999px; padding: 8px 18px; font-family: var(--mono); font-weight: 700; font-size: 13px; cursor: pointer; }
+  .ear-replay:hover { background: #f2efe7; }
+  .earchoices { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .ear-choice { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 12px; padding: 12px 20px; font-family: var(--mono); font-weight: 700; font-size: 15px; cursor: pointer; transition: .12s; }
+  .ear-choice:hover:not(:disabled) { background: var(--ink); color: var(--paper); transform: translateY(-1px); }
+  .ear-choice:disabled { cursor: default; opacity: .9; }
+  .ear-choice.right { background: var(--ink); color: var(--paper); box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--ink); }
+  .ear-choice.wrong { background: var(--paper); color: var(--ink2); border-style: dashed; text-decoration: line-through; }
+  .earfeedback { font-family: var(--mono); font-size: 13px; min-height: 20px; text-align: center; color: var(--ink2); line-height: 1.7; }
+  .earfeedback.ok { color: var(--ink); font-weight: 700; } .earfeedback.no { color: #a13a2a; }
+  .earctrl { display: flex; gap: 10px; justify-content: center; }
+  .ear-go, .ear-next { background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: 999px; padding: 11px 26px; font-family: var(--mono); font-weight: 700; font-size: 14px; cursor: pointer; letter-spacing: 1px; transition: transform .12s; }
+  .ear-go:hover, .ear-next:hover { transform: translateY(-1px); }
+
+  /* 樂理講解 (theory) */
+  .theorypanel { padding: 18px 20px; flex-direction: column; gap: 14px; }
+  .thead { display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 12px; color: var(--ink2); letter-spacing: 1px; flex-wrap: wrap; gap: 8px; }
+  .tnav { font-weight: 700; }
+  .tcard { background: #fffefb; border: 2px solid var(--ink); border-radius: 16px; padding: 22px 24px; box-shadow: 6px 7px 0 -2px rgba(22,21,15,0.14), 11px 13px 0 -4px rgba(22,21,15,0.07); display: flex; flex-direction: column; gap: 12px; }
+  .tsym { font-family: var(--mono); font-weight: 700; font-size: 15px; letter-spacing: 3px; color: var(--ink2); }
+  .ttitle { font-family: var(--display); font-weight: 800; font-size: 24px; line-height: 1.15; }
+  .tbody { font-family: var(--mono); font-size: 13px; line-height: 1.9; color: var(--ink); }
+  .tsong { font-family: var(--mono); font-size: 12px; line-height: 1.7; color: var(--ink2); border-left: 3px solid var(--ink); padding-left: 11px; }
+  .tplays { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 4px; align-items: flex-start; }
+  .tplaywrap { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; }
+  .tplay { background: var(--ink); color: var(--paper); border: 2px solid var(--ink); border-radius: 999px; padding: 10px 18px; font-family: var(--mono); font-weight: 700; font-size: 13px; cursor: pointer; transition: transform .12s; }
+  .tplay:hover { transform: translateY(-1px); }
+  .tspell { font-family: var(--mono); font-size: 12.5px; color: var(--ink2); letter-spacing: 1.5px; padding-left: 6px; }
+  .tctrl { display: flex; gap: 10px; align-items: center; }
+  .tprev, .tnext { border: 2px solid var(--ink); background: var(--paper); color: var(--ink); border-radius: 999px; padding: 10px 20px; font-family: var(--mono); font-weight: 700; font-size: 13px; cursor: pointer; transition: .12s; }
+  .tprev:hover { background: var(--ink); color: var(--paper); }
+  .tnext { margin-left: auto; background: var(--ink); color: var(--paper); }
+  .tnext:hover { transform: translateY(-1px); }
+
+  /* ============ polish pass — game feel & hand-drawn juice ============ */
+  :focus-visible { outline: 2.5px dashed var(--ink); outline-offset: 3px; border-radius: 4px; }
+  ::selection { background: var(--ink); color: var(--paper); }
+  h1, .dtitle, .ttitle, .earprompt, .bs-name { text-wrap: balance; }
+  .dbody, .tbody, .endmsg { text-wrap: pretty; }
+
+  h1 { position: relative; display: inline-block; padding-bottom: 8px; }
+  h1::after { content: ""; position: absolute; left: 2px; right: 6px; bottom: 0; height: 7px; opacity: .9;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='7' viewBox='0 0 60 7'%3E%3Cpath d='M0 4 Q7.5 .5 15 4 T30 4 T45 4 T60 4' fill='none' stroke='%2316150f' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x; background-size: 60px 7px; }
+
+  .doodles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  .doodles span { position: absolute; font-family: Georgia, serif; color: var(--ink); opacity: .07; user-select: none; }
+  @media (max-width: 1080px) { .doodles { display: none; } }
+
+  .modebar { flex-wrap: wrap; }
+  .modebtn:nth-child(odd) { rotate: -.8deg; } .modebtn:nth-child(even) { rotate: .6deg; }
+  .modebtn:hover:not(.active) { transform: translateY(-2px); box-shadow: 0 4px 0 -1px rgba(22,21,15,.3); }
+  .bardchip { position: sticky; top: 10px; z-index: 40; }
+  .bardchip.gain { animation: chipgain .55s cubic-bezier(.2,1.4,.4,1); }
+  @keyframes chipgain { 35% { transform: scale(1.018); box-shadow: 0 4px 0 -1px rgba(22,21,15,.3); } }
+  .bc-streak.hot { display: inline-block; animation: flame 1.1s ease-in-out infinite; }
+  @keyframes flame { 50% { transform: scale(1.2) rotate(-7deg); } }
+
+  .go-btn { box-shadow: 3px 4px 0 -1px rgba(22,21,15,.32); }
+  .go-btn:hover { transform: translateY(-2px); box-shadow: 4px 6px 0 -1px rgba(22,21,15,.32); }
+  .bpm button:hover, .range-box button:hover { background: var(--ink); color: var(--paper); }
+  select:hover { background: #f2efe7; }
+  .dskip:hover { text-decoration: underline wavy 1.5px; }
+  #patSel { max-width: min(340px, 58vw); }
+  .mic-btn.attn { animation: micattn 1.7s ease-in-out infinite; }
+  @keyframes micattn { 50% { transform: translateY(-2.5px); box-shadow: 0 5px 0 -2px rgba(22,21,15,.28); } }
+
+  .modebtn:active, .go-btn:active, .mic-btn:active, .endbtns button:active, .dprev:active, .dnext:active,
+  .dready:active, .ear-go:active, .ear-next:active, .ear-replay:active, .tplay:active, .tprev:active,
+  .tnext:active, .bpm button:active, .range-box button:active, .bardchip:active,
+  .ear-choice:active:not(:disabled), .bs-levelup:active:not(:disabled) { transform: translateY(2px) scale(.98); }
+
+  kbd { font-family: var(--mono); font-size: 10.5px; border: 1.5px solid var(--ink); border-bottom-width: 3px; border-radius: 5px; padding: 0 5px; background: #fffefb; color: var(--ink); }
+
+  /* endscreen: rubber-stamp grade + staggered entry */
+  .grade { position: relative; rotate: -4deg; padding: 4px 30px; }
+  .grade::before { content: ""; position: absolute; inset: -8px -4px; border: 4.5px solid var(--ink); border-radius: 48% 52% 50% 50% / 53% 47% 52% 48%; rotate: -7deg; opacity: .88; }
+  .endscreen.show .grade { animation: stamp .5s cubic-bezier(.2,1.45,.4,1) both; }
+  @keyframes stamp { 0% { transform: scale(2.7) rotate(6deg); opacity: 0; } 55% { transform: scale(.9); opacity: 1; } 100% { transform: scale(1); } }
+  .endscreen.show .endstat { animation: rise .45s .14s both; }
+  .endscreen.show .endmsg  { animation: rise .45s .22s both; }
+  .endscreen.show .endbtns { animation: rise .45s .3s both; }
+
+  /* lesson deck: dealt-card feel */
+  .dcard { rotate: -.4deg; }
+  #dCards.flip { animation: dealin .32s cubic-bezier(.2,1.15,.4,1); }
+  @keyframes dealin { from { transform: translateY(18px) rotate(1.6deg); opacity: 0; } }
+
+  /* ear mode juice */
+  .earstage { position: relative; }
+  .earstats b { display: inline-block; }
+  .earstage.shake { animation: shakex .42s cubic-bezier(.3,.1,.3,1); }
+  @keyframes shakex { 20% { transform: translateX(-8px) rotate(-.5deg); } 40% { transform: translateX(7px); } 60% { transform: translateX(-5px) rotate(.4deg); } 80% { transform: translateX(3px); } }
+  .earpop { position: absolute; top: 18%; font-family: var(--display); font-weight: 800; font-size: 19px; color: var(--ink); pointer-events: none; animation: earpop 1s cubic-bezier(.2,.7,.3,1) forwards; }
+  @keyframes earpop { from { opacity: 1; transform: translate(-50%,0) scale(.7) rotate(var(--r,0deg)); } to { opacity: 0; transform: translate(-50%,-74px) scale(1.3) rotate(var(--r,0deg)); } }
+
+  /* theory: playing pulse */
+  .tplay.playing { animation: playpulse .6s ease-in-out infinite; }
+  @keyframes playpulse { 50% { box-shadow: 0 0 0 3px var(--paper), 0 0 0 5.5px var(--ink); transform: translateY(-1.5px); } }
+
+  /* level-up confetti */
+  .bs-card { position: relative; }
+  .confetti { position: absolute; left: 50%; top: 38%; font-size: 19px; color: var(--ink); pointer-events: none; animation: conf 1.15s cubic-bezier(.15,.6,.4,1) forwards; }
+  @keyframes conf { from { transform: translate(0,0) rotate(0deg); opacity: 1; } to { transform: translate(var(--dx,0px), var(--dy,-80px)) rotate(var(--rr,90deg)); opacity: 0; } }
+
+  @media (max-width: 640px) {
+    body { padding: 18px 12px 48px; }
+    h1 { font-size: 25px; }
+    canvas { height: 250px; }
+    .scorebar { gap: 18px; }
+    .scorebar .score .v { font-size: 28px; }
+    .bc-title { display: none; }
+  }
+  /* 切模式的面板用快版進場(蓋掉頁面載入的 stagger 延遲,避免切換時空一拍) */
+  #earPanel, #theoryPanel { animation-duration: .3s; animation-delay: 0s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+<!-- hand-drawn roughness filter for SVG doodles -->
+<svg width="0" height="0" style="position:absolute"><filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3"/></filter></svg>
+
+<!-- 頁邊手繪塗鴉(寬螢幕才看得到,純裝飾) -->
+<div class="doodles" aria-hidden="true">
+  <span style="left:3%;top:11%;font-size:46px;rotate:-14deg">♪</span>
+  <span style="right:4%;top:8%;font-size:62px;rotate:10deg">♫</span>
+  <span style="left:5%;top:56%;font-size:34px;rotate:8deg">★</span>
+  <span style="right:3%;top:44%;font-size:38px;rotate:-7deg">♩</span>
+  <span style="right:6%;bottom:9%;font-size:52px;rotate:-12deg">♪</span>
+  <span style="left:4%;bottom:13%;font-size:40px;rotate:14deg">✎</span>
+</div>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="kicker">Designer Soul · Developer Brain</div>
+      <h1>音準鏡 / PITCH BARD</h1>
+      <div class="sub" id="tagline">一串音往你這邊跑來，唱準它。 <span class="cur">_</span></div>
+    </div>
+    <select id="keySel">
+      <option value="D">KEY: D 大調 (seasons / Dreamer)</option>
+      <option value="A">KEY: A 大調 (My Love)</option>
+      <option value="E">KEY: E 大調 (homebody)</option>
+      <option value="C">KEY: C 大調 (才二十三)</option>
+    </select>
+  </header>
+
+  <div class="modebar">
+    <button class="modebtn active" data-mode="game">🎵 跟著唱</button>
+    <button class="modebtn" data-mode="free">🪞 自由鏡</button>
+    <button class="modebtn" data-mode="ear">🎧 聽辨</button>
+    <button class="modebtn" data-mode="theory">📖 講解</button>
+  </div>
+
+  <button class="bardchip" id="bardChip" title="打開 Bard 檔案">
+    <span class="bc-ic">🎭</span>
+    <span class="bc-lv" id="bcLv">Lv.1</span>
+    <span class="bc-title" id="bcTitle">哼唱者</span>
+    <span class="bc-xpbar"><i id="bcXpFill"></i></span>
+    <span class="bc-streak" id="bcStreak">🔥0</span>
+    <span class="bc-go">PROFILE ›</span>
+  </button>
+
+  <div class="card readout">
+    <div><div class="note-big" id="noteBig">—</div><div class="hz" id="hz">— Hz</div></div>
+    <div>
+      <div class="cents-label"><span>♭ FLAT</span><span>準 · IN TUNE</span><span>SHARP ♯</span></div>
+      <div class="cents-bar"><div class="cents-green"></div><div class="cents-marker" id="centsMarker"></div></div>
+      <div class="verdict" id="verdict">選音型，按 ▶ START，跟著往左捲的音符唱。</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <canvas id="trail" width="1600" height="640"></canvas>
+    <div class="endscreen" id="endScreen">
+      <div class="grade" id="egGrade">A</div>
+      <div class="endstat" id="egStat">—</div>
+      <div class="endmsg" id="egMsg">—</div>
+      <div class="endbtns">
+        <button class="again" id="egAgain">▶ AGAIN (↵)</button>
+        <button class="other" id="egOther">🔀 換音型</button>
+      </div>
+    </div>
+    <div class="lessondeck" id="lessonDeck">
+      <div class="deckwrap">
+        <div class="decknav"><span class="dpage" id="dPage">1 / 1</span><button class="dskip" id="dSkip">SKIP ⏭</button></div>
+        <div class="dcard" id="dCards"></div>
+        <div class="dctrl">
+          <button class="dprev" id="dPrev">◀</button>
+          <button class="dnext" id="dNext">NEXT ▶</button>
+          <button class="dready" id="dReady">&gt; READY TO EXECUTE <span class="cur">_</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scorebar" id="scoreBar">
+    <div class="blk score"><span class="v" id="scScore">0</span><span class="l">Score</span></div>
+    <div class="blk"><span><span class="v small" id="scCombo">0</span> <span class="mult" id="scMult">×1</span></span><span class="l">Combo</span></div>
+    <div class="blk"><span class="v small" id="scHit">0/0</span><span class="l">命中 Hit</span></div>
+    <div class="blk"><span class="v small" id="scBest">0</span><span class="l">Best</span></div>
+  </div>
+
+  <div class="card gamebar" id="gameBar">
+    <div class="grp">音型 <select id="patSel"></select></div>
+    <div class="grp bpm">BPM <button id="bpmDown">−</button><b id="bpmVal">70</b><button id="bpmUp">+</button></div>
+    <label class="toggle"><input type="checkbox" id="cueChk" checked /> 提示音</label>
+    <label class="toggle"><input type="checkbox" id="backChk" checked /> 🎸 伴奏</label>
+    <label class="toggle"><input type="checkbox" id="autoChk" /> 自動連續</label>
+    <button class="go-btn" id="goBtn">▶ START</button>
+  </div>
+
+  <div class="controls">
+    <button class="mic-btn" id="micBtn">🎤 開麥克風</button>
+    <div class="range-box">音域 <b id="rangeLo">—</b> ~ <b id="rangeHi">—</b> <button id="rangeReset">RESET</button></div>
+  </div>
+  <div class="status" id="status"></div>
+
+  <div class="card earpanel" id="earPanel" style="display:none">
+    <div class="earhead">
+      <div class="grp">難度 <select id="earLevel">
+        <option value="basic">大調 / 小調</option>
+        <option value="sevenths">七和弦色彩（你的口味）</option>
+      </select></div>
+      <div class="earstats">🎧 連對 <b id="earStreak">0</b> · 總答對 <b id="earTotal">0</b></div>
+    </div>
+    <div class="earstage">
+      <div class="earprompt" id="earPrompt">按 ▶ 出題，聽完選它是哪個和弦。先聽、再認 — 聲音優先。</div>
+      <button class="ear-replay" id="earReplay" style="display:none">🔊 重聽</button>
+    </div>
+    <div class="earchoices" id="earChoices"></div>
+    <div class="earfeedback" id="earFeedback"></div>
+    <div class="earctrl">
+      <button class="ear-go" id="earGo">▶ 出題</button>
+      <button class="ear-next" id="earNext" style="display:none">下一題 ▶</button>
+    </div>
+  </div>
+
+  <div class="card theorypanel" id="theoryPanel" style="display:none">
+    <div class="thead">
+      <span class="tnav" id="thPage">1 / 5</span>
+      <span>📖 你的聲音是怎麼搭起來的</span>
+    </div>
+    <div class="tcard">
+      <div class="tsym" id="thSym"></div>
+      <div class="ttitle" id="thTitle"></div>
+      <div class="tbody" id="thBody"></div>
+      <div class="tsong" id="thSong"></div>
+      <div class="tplays" id="thPlays"></div>
+    </div>
+    <div class="tctrl">
+      <button class="tprev" id="thPrev">◀</button>
+      <button class="tnext" id="thNext">下一個 ▶</button>
+    </div>
+  </div>
+
+  <div class="card tips">
+    <b>玩法</b>：開麥克風 → 選音型 → ▶ START →（3-2-1 後）音符捲到<b>中線</b>時唱準它。<br>
+    判定 <b>PERFECT / GREAT / GOOD / MISS</b>，連擊累積 <b>倍率 ×1→×8</b>，刷高分。結束按 <b>↵</b> 再來。<br>
+    <b>🎸 伴奏</b>開著時，底下會鋪和弦 pad + 極輕拍點（seasons / My Love 走真實進行，其他音型鋪該和弦的床）——把練音型變成「唱一首歌」。<br>
+    <b>⌨️ 快捷鍵</b>：<kbd>空白</kbd> 開始/停止 · <kbd>1</kbd>–<kbd>4</kbd> 切模式 · 聽辨 <kbd>1</kbd>–<kbd>5</kbd> 作答、<kbd>R</kbd> 重聽、<kbd>↵</kbd> 下一題 · 講解 <kbd>←</kbd><kbd>→</kbd> 翻頁<br>
+    <b>🎧 建議戴耳機</b>：用喇叭外放時，麥克風會收到提示音而誤判命中（已開回音消除，但耳機最保險）。<br>
+    麥克風打不開？ Chrome 偶爾擋 <code>file://</code>，跟我說我用 localhost 開。
+  </div>
+</div>
+
+<div class="bardscreen" id="bardScreen">
+  <div class="bs-card">
+    <div class="bs-top"><span class="bs-kicker">BARD · LEVEL ↑</span><button class="bs-close" id="bsClose">✕</button></div>
+    <div class="bs-char" id="bsChar"></div>
+    <div class="bs-name" id="bsName">哼唱者</div>
+    <div class="bs-lv" id="bsLv">lv. 1 <span>(0 exp)</span></div>
+    <div class="bs-xpbar"><i id="bsXpFill"></i></div>
+    <div class="bs-xprange"><span id="bsXpLo">0 exp</span><span id="bsXpHi">1500 exp</span></div>
+    <button class="bs-levelup" id="bsLevelUp">INCREASE LEVEL</button>
+    <div class="bs-stats">
+      <div><b id="bsStreak">0</b><span>連續天數 🔥</span></div>
+      <div><b id="bsStars">0</b><span>總星數 ⭐</span></div>
+      <div><b id="bsKnow">0/12</b><span>音型掌握</span></div>
+    </div>
+    <div class="bs-ms" id="bsMs"></div>
+  </div>
+</div>
+
+<script>
+/* ===================== pitch math (verified, unchanged) ===================== */
+const NOTE_NAMES = ["C","C♯","D","D♯","E","F","F♯","G","G♯","A","A♯","B"];
+function freqToMidi(f){ return 69 + 12*Math.log2(f/440); }
+function midiToName(m){ const r=Math.round(m); return NOTE_NAMES[((r%12)+12)%12]+(Math.floor(r/12)-1); }
+function midiToFreq(m){ return 440*Math.pow(2,(m-69)/12); }
+function autoCorrelate(b, sr){
+  let SIZE=b.length, rms=0;
+  for(let i=0;i<SIZE;i++) rms+=b[i]*b[i];
+  rms=Math.sqrt(rms/SIZE); if(rms<0.01) return -1;
+  let r1=0,r2=SIZE-1,th=0.2;
+  for(let i=0;i<SIZE/2;i++) if(Math.abs(b[i])<th){r1=i;break;}
+  for(let i=1;i<SIZE/2;i++) if(Math.abs(b[SIZE-i])<th){r2=SIZE-i;break;}
+  b=b.slice(r1,r2); SIZE=b.length;
+  const c=new Float32Array(SIZE);
+  for(let i=0;i<SIZE;i++) for(let j=0;j<SIZE-i;j++) c[i]+=b[j]*b[j+i];
+  let d=0; while(d<SIZE-1 && c[d]>c[d+1]) d++;
+  let mv=-1,mp=-1; for(let i=d;i<SIZE;i++) if(c[i]>mv){mv=c[i];mp=i;}
+  let T0=mp; if(T0<=0) return -1;
+  const x1=c[T0-1]||0,x2=c[T0],x3=c[T0+1]||0, a=(x1+x3-2*x2)/2, bb=(x3-x1)/2;
+  if(a) T0=T0-bb/(2*a);
+  const f=sr/T0; if(f<70||f>1100) return -1; return f;
+}
+
+/* ===================== patterns (verified, unchanged) ===================== */
+const MAJOR_PCS=[0,2,4,5,7,9,11];
+const GAME_ROOT={D:50,A:57,E:52,C:48};
+function offs(arr){ return arr.map(o=>({off:o})); }
+function abss(arr){ return arr.map(m=>({abs:m})); }
+const PATTERNS={
+  scale:   {grp:"暖身", name:"音階上下", build:()=>offs([0,2,4,5,7,9,11,12,11,9,7,5,4,2,0])},
+  majtri:  {grp:"和弦音", name:"大三和弦琶音", build:()=>offs([0,4,7,12,7,4,0])},
+  mintri:  {grp:"和弦音", name:"小三和弦琶音", build:()=>offs([0,3,7,12,7,3,0])},
+  maj7:    {grp:"和弦音", name:"maj7 琶音", build:()=>offs([0,4,7,11,12,11,7,4,0])},
+  dom7:    {grp:"和弦音", name:"屬7 琶音", build:()=>offs([0,4,7,10,12,10,7,4,0])},
+  min7:    {grp:"和弦音", name:"min7 琶音", build:()=>offs([0,3,7,10,12,10,7,3,0])},
+  seasons: {grp:"歌曲巡禮", name:"seasons 和弦音 (D)", build:()=>abss([50,54,57,61, 50,54,57,60, 55,59,62,66, 55,58,62,64])},
+  mylove:  {grp:"歌曲巡禮", name:"My Love 和弦音 (A)", build:()=>abss([57,61,64,68, 49,53,56,59, 50,54,57, 50,53,57])},
+  dreamer: {grp:"歌曲巡禮", name:"Dreamer 和弦音 (D · Laufey)", build:()=>abss([50,54,57,61, 55,59,62,66, 55,58,62,64, 57,61,64,67])},
+  homebody:{grp:"歌曲巡禮", name:"homebody 和弦音 (E · Kamal.)", build:()=>abss([52,56,59,63, 57,61,64,68, 52,56,59,63, 57,61,64,68])},
+  fang23:  {grp:"歌曲巡禮", name:"才二十三 和弦音 (C · 方大同)", build:()=>abss([48,52,55,59, 48,52,55,58, 53,57,60,64, 53,56,60,62])},
+  thirds:  {grp:"挑戰", name:"三度跳", build:()=>offs([0,4,2,5,4,7,5,9,7,11,9,12])},
+  leapsfifth:{grp:"挑戰", name:"五度／八度跳", build:()=>offs([0,7,0,12,7,0,12,5,0])},
+  semi:    {grp:"挑戰", name:"半音嘆氣 (seasons 那招)", build:()=>offs([4,3,9,8,11,10,7,6,0])},
+  random:  {grp:"挑戰", name:"隨機跳音", build:()=>{const sc=[0,2,4,5,7,9,11,12];const a=[];for(let i=0;i<12;i++)a.push({off:sc[(Math.random()*sc.length)|0]});return a;}}
+};
+
+/* ===================== lesson cards (Slice 2) — 每關的樂理卡 + 設計卡 ===================== */
+const LESSONS={
+  scale:[
+    {tag:"🎵 THEORY",t:"大調音階 = 一把尺",b:"Do Re Mi Fa Sol La Ti Do。七個音 + 回家。所有和弦、旋律都從這把尺量出來。先把尺唱準，後面都好辦。"},
+    {tag:"🎨 DESIGN",t:"留白 White Space",b:"參考圖為什麼好看？因為敢留空。空白不是浪費，是讓重點呼吸——就像旋律裡的休止符讓聲音有重量。"}],
+  majtri:[
+    {tag:"🎵 THEORY",t:"大三和弦 = 1·3·5",b:"從尺上挑第 1、3、5 個音疊起來。明亮、穩定、像「家」。所有和聲的地基。唱琶音 = 把和弦拆開一個一個唱。"},
+    {tag:"🎨 DESIGN",t:"對比 Contrast",b:"純黑配紙白 = 最大對比 = 最清楚。設計跟唱歌一樣：有強弱對比才有戲，全部一樣大聲 = 沒重點。"}],
+  mintri:[
+    {tag:"🎵 THEORY",t:"小三和弦 = 1·♭3·5",b:"只把大三的第 3 音降半音(♭3)，情緒整個翻成憂鬱。一個音的差別 = 大調與小調。耳朵記住這半音。"},
+    {tag:"🎨 DESIGN",t:"一個變數 One Variable",b:"大三→小三只動一個音。好設計也是：改一個變數(顏色/粗細/間距)就換氣氛，不用全部重來。"}],
+  maj7:[
+    {tag:"🎵 THEORY",t:"Maj7 = 1·3·5·7",b:"大三和弦 + 第 7 音。那個 7 度讓它「漂浮、夢幻」——seasons、Laufey 整片的甜味。你耳朵早就愛它了。"},
+    {tag:"🎵 THEORY",t:"為什麼夢幻",b:"7 度音離根音只差半音，製造一種「沒完全落地」的懸浮感。不解決的張力 = 美。"},
+    {tag:"🎨 DESIGN",t:"字體配對",b:"Designer Soul × Developer Brain：Bricolage(塗鴉感)配 Space Mono(精準等寬)。一感性一理性 = 張力。配字像配和弦。"}],
+  dom7:[
+    {tag:"🎵 THEORY",t:"屬七 = 1·3·5·♭7",b:"跟 Maj7 只差一個音：7 度降半音變 ♭7。它產生「往前拉」的力，硬要解決到下一個和弦。流行/爵士一半的動力。"},
+    {tag:"🎨 DESIGN",t:"張力與解決",b:"屬七想往前，就像畫面裡一個沒對齊的元素會讓你想修正。設計師故意製造張力再解決，引導視線。"}],
+  min7:[
+    {tag:"🎵 THEORY",t:"Min7 = 1·♭3·5·♭7",b:"小三和弦 + ♭7。比小三更柔、更爵士、更慵懶。Neo-soul、bedroom R&B 的招牌色。"},
+    {tag:"🎨 DESIGN",t:"質感 Texture",b:"畫面那層紙紋顆粒 = min7 的慵懶。乾淨太冷，加一點噪點就有溫度。聲音跟畫面都需要「質感」。"}],
+  seasons:[
+    {tag:"🎵 THEORY",t:"seasons 四和弦",b:"Dmaj7 → D7 → Gmaj7 → Gm6 = Imaj7 → I7 → IVmaj7 → iv6。你要一個一個唱出它們的和弦音。"},
+    {tag:"🎵 THEORY",t:"半音下行的嘆氣",b:"Dmaj7→D7 的 C♯→C、Gmaj7→Gm6 的 B→B♭。兩聲往下的半音 = 那種「融化」。借來的小調 iv 最催淚。"},
+    {tag:"🎨 DESIGN",t:"主題一致性",b:"設計有「主題」，每個選擇都從它長出來——像一首歌所有和弦都在一個調裡。一致 = 有靈魂。"}],
+  mylove:[
+    {tag:"🎵 THEORY",t:"My Love 的招數",b:"Amaj7 → C♯7 → D → Dm = Imaj7 → III7 → IV → iv。D→Dm 就是 seasons 那招(借用小調 iv)，只動一根手指。"},
+    {tag:"🎨 DESIGN",t:"重複與變奏",b:"My Love 用跟 seasons 同一招、換個調。設計系統也是：同一個元件重複用，微調就成系列。"}],
+  dreamer:[
+    {tag:"🎵 THEORY",t:"Dreamer = seasons 的姊妹",b:"Dmaj7 → Gmaj7 → Gm6 → A7 = Imaj7 → IVmaj7 → iv6 → V7。那個 Gmaj7→Gm6(B→B♭) 就是你在 seasons 唱過的「嘆氣」——同一招、同一個 D 調，換 Laufey 唱。你耳朵早就會了。"},
+    {tag:"🎵 THEORY",t:"借用 iv = 你的口味簽名",b:"深挖你 155 首收藏：這個「大調→小調 iv」的融化感，出現在 seasons、My Love、Dreamer、Bruno Major〈Home〉… 是你最常被電到的一招。記住這個聲音。"},
+    {tag:"🎨 DESIGN",t:"變奏 Variation",b:"Laufey 拿流行的 maj7 + 借用 iv，加爵士句法，就成了她。設計也是：同一個底，換個語氣 = 個人風格。"}],
+  homebody:[
+    {tag:"🎵 THEORY",t:"homebody = 兩個 maj7",b:"Emaj7 → Amaj7 = Imaj7 → IVmaj7。整首靠兩個和弦。maj7 的第 7 音讓它「漂浮、慵懶、在家」。最少的和弦，最對的味道。"},
+    {tag:"🎵 THEORY",t:"為什麼兩個就夠",b:"Imaj7 ↔ IVmaj7 來回，就是一整片 bedroom-pop。你怕「學不完」——這首證明：會兩個 maj7 就能唱一首歌。完成 > 完美。"},
+    {tag:"🎨 DESIGN",t:"極簡 Minimalism",b:"兩個和弦 = 設計的留白。少即是多。Kamal. 不靠複雜，靠氣氛——跟你的黑白塗鴉同一個信仰。"}],
+  fang23:[
+    {tag:"🎵 THEORY",t:"才二十三 = seasons 的招，低一個全音",b:"Cmaj7 → C7 → Fmaj7 → Fm6 = Imaj7 → I7 → IVmaj7 → iv6。發現了嗎？這就是 seasons 的進行，整個低一個全音。你 #1 最常重播的歌，跟你的錨歌同一招——借用 iv ＋ maj7→屬七的半音下行。"},
+    {tag:"🎵 THEORY",t:"R&B 的延伸甜味",b:"原曲在 E♭，用 maj9 / m6 / m11 這些延伸和弦——就是你 maj7 甜味的進階版。方大同(你 Rewind #1 熱播藝人)2024 遺作，得金曲最佳作曲人獎。"},
+    {tag:"🎨 DESIGN",t:"限制 = 風格",b:"整首十個和弦，卻只用一種右手指法。限制不是少，是讓一個元素被聽見——跟你的黑白塗鴉同一個信仰。"}],
+  thirds:[
+    {tag:"🎵 THEORY",t:"三度 = 和聲的磚塊",b:"和弦是「疊三度」堆出來的(1→3→5→7)。在音階上練跳三度，耳朵就開始聽得到「和聲」而不只是旋律。"},
+    {tag:"🎨 DESIGN",t:"節奏感 Rhythm",b:"版面也有節奏：大小、間距的交替 = 視覺的拍子。旋律的起伏跟元素的疏密，是同一種律動。"}],
+  leapsfifth:[
+    {tag:"🎵 THEORY",t:"五度 = 最穩的跳",b:"五度(1→5)是除了八度外最和諧的音程，調性的骨架。唱大跳考驗音準——先在腦中聽到目標音再唱(audiation)。"},
+    {tag:"🎨 DESIGN",t:"層級 Hierarchy",b:"大跳 = 畫面裡的大標題。大小落差製造層級，眼睛先看大的。沒層級 = 沒有起伏的歌，平。"}],
+  semi:[
+    {tag:"🎵 THEORY",t:"半音 = 最小的距離",b:"相鄰兩格的距離。往下的半音 = 「嘆氣」，seasons 那招的核心。最小的移動，最大的情緒。"},
+    {tag:"🎨 DESIGN",t:"微調的力量",b:"半音是音樂最小的一步，卻最有感。設計也是：1px 間距、5% 的灰、一點圓角——專業差在微調。"}],
+  random:[
+    {tag:"🎵 THEORY",t:"音程聽辨",b:"隨機跳音 = 訓練耳朵抓任意兩音的距離。這是「相對音感」的核心：聽到就知道差幾度。最難也最有用。"},
+    {tag:"🎨 DESIGN",t:"刻意練習",b:"隨機 = 不能靠肌肉記憶，逼你真的聽。臨摹參考圖也別只複製，問「為什麼這樣排」，才會內化。"}]
+};
+
+/* ===================== state ===================== */
+const MIDI_LO=48, MIDI_HI=84;
+let keyName="D", mode="game", bpm=70;
+let audioCtx=null, analyser=null, micStream=null, buf=null, micOn=false, rafId=null;
+let rangeLo=null, rangeHi=null, liveMidi=null;
+const trail=new Array(620).fill(null);
+let gameActive=false, notes=[], gameStartT=0, lastNow=0, scTotal=0, lastTick=-1;
+let score=0, combo=0, best=0, hitCount=0, judgeCount={PERFECT:0,GREAT:0,GOOD:0,MISS:0};
+const LEAD=3, PX_PER_BEAT=160, NOW_X=400, T_PERFECT=20, T_GREAT=45, T_GOOD=80;
+const popups=[], sparks=[]; let beatPulse=0, lastBeatInt=-1, shakeT=0;
+let masterDry=null, reverbSend=null, reverbWet=null;
+
+const $=id=>document.getElementById(id);
+const cvs=$("trail"), g=cvs.getContext("2d");
+const noteBig=$("noteBig"), hzEl=$("hz"), centsMarker=$("centsMarker"), verdict=$("verdict");
+const statusEl=$("status"), micBtn=$("micBtn"), goBtn=$("goBtn"), endScreen=$("endScreen");
+
+(function(){ const groups={}; Object.keys(PATTERNS).forEach(k=>{ const p=PATTERNS[k]; (groups[p.grp]=groups[p.grp]||[]).push([k,p.name]); });
+  Object.keys(groups).forEach(grp=>{ const og=document.createElement("optgroup"); og.label=grp; groups[grp].forEach(([k,n])=>{ const o=document.createElement("option"); o.value=k; o.textContent=n; og.appendChild(o); }); $("patSel").appendChild(og); }); })();
+
+/* ===================== audio (verified piano + reverb, unchanged) ===================== */
+function ensureCtx(){ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==="suspended") audioCtx.resume(); if(audioCtx && !masterDry) setupBus(); }
+/* 穩健音訊解鎖:Safari/iOS 會在「剛載入 / 切分頁 / 被打斷」時暫停 AudioContext。
+   在任何使用者手勢時建立並 resume,並在回到分頁時重新喚醒,避免聲音默默掉。 */
+function unlockAudio(){
+  try{
+    ensureCtx();
+    if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
+    if(audioCtx && !audioCtx._primed){ const b=audioCtx.createBuffer(1,1,audioCtx.sampleRate), s=audioCtx.createBufferSource(); s.buffer=b; s.connect(audioCtx.destination); s.start(0); audioCtx._primed=true; }
+  }catch(e){}
+}
+["pointerdown","touchend","keydown"].forEach(ev=> window.addEventListener(ev, unlockAudio, {passive:true}));
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden && audioCtx && audioCtx.state==="suspended") audioCtx.resume(); });
+function makeIR(sec,decay){ const rate=audioCtx.sampleRate, len=Math.floor(rate*sec), buf=audioCtx.createBuffer(2,len,rate); for(let ch=0;ch<2;ch++){ const d=buf.getChannelData(ch); for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay); } return buf; }
+function setupBus(){
+  masterDry=audioCtx.createGain(); masterDry.gain.value=0.9; masterDry.connect(audioCtx.destination);
+  const conv=audioCtx.createConvolver(); conv.buffer=makeIR(2.2,2.6);
+  reverbWet=audioCtx.createGain(); reverbWet.gain.value=0.16;
+  reverbSend=audioCtx.createGain(); reverbSend.gain.value=1;
+  reverbSend.connect(conv); conv.connect(reverbWet); reverbWet.connect(audioCtx.destination);
+}
+function softTone(freq, dur, peak){
+  ensureCtx(); const t=audioCtx.currentTime; peak=peak||0.3;
+  const out=audioCtx.createGain(); out.gain.value=1; out.connect(masterDry); out.connect(reverbSend);
+  const nlen=Math.floor(audioCtx.sampleRate*0.02), nbuf=audioCtx.createBuffer(1,nlen,audioCtx.sampleRate), nd=nbuf.getChannelData(0);
+  for(let i=0;i<nlen;i++) nd[i]=(Math.random()*2-1)*(1-i/nlen);
+  const ns=audioCtx.createBufferSource(); ns.buffer=nbuf;
+  const nf=audioCtx.createBiquadFilter(); nf.type="bandpass"; nf.frequency.value=Math.min(3500,freq*4); nf.Q.value=0.8;
+  const ng=audioCtx.createGain(); ng.gain.value=peak*0.22; ns.connect(nf); nf.connect(ng); ng.connect(out); ns.start(t);
+  [[1,1,1.0],[2,0.55,0.62],[3,0.32,0.44],[4,0.2,0.32],[5,0.12,0.24],[6,0.07,0.18]].forEach(function(p){
+    const mult=p[0],amp=p[1],lf=p[2], o=audioCtx.createOscillator(); o.type="sine";
+    o.frequency.value=freq*mult*(1+0.0007*mult*mult);
+    const g2=audioCtx.createGain(), a=peak*amp;
+    g2.gain.setValueAtTime(0.0001,t);
+    g2.gain.exponentialRampToValueAtTime(a, t+0.004);
+    g2.gain.exponentialRampToValueAtTime(Math.max(a*0.28,0.0003), t+0.06);
+    g2.gain.exponentialRampToValueAtTime(0.0001, t+0.12+dur*1.6*lf);
+    o.connect(g2); g2.connect(out); o.start(t); o.stop(t+dur*1.7+0.4);
+  });
+}
+function sfxHit(level){ softTone(880,0.13,0.09); setTimeout(()=>softTone(level>=1?1568:1320,0.12,0.06),45); }
+function sfxMiss(){ ensureCtx(); const t=audioCtx.currentTime,o=audioCtx.createOscillator(),g2=audioCtx.createGain(),lp=audioCtx.createBiquadFilter(); o.type="sine"; o.frequency.setValueAtTime(180,t); o.frequency.exponentialRampToValueAtTime(90,t+0.18); lp.type="lowpass"; lp.frequency.value=500; g2.gain.setValueAtTime(0.2,t); g2.gain.exponentialRampToValueAtTime(0.0001,t+0.2); o.connect(g2); g2.connect(lp); lp.connect(audioCtx.destination); o.start(t); o.stop(t+0.22); }
+function sfxCombo(level){ const base=660*Math.pow(2,Math.min(level,6)/24); [0,0.07,0.14].forEach((d,i)=>setTimeout(()=>softTone(base*Math.pow(1.26,i),0.2,0.18),d*1000)); }
+function sfxTick(go){ softTone(go?760:480, go?0.18:0.07, 0.16); }
+function sfxEnd(){ const root=midiToFreq(GAME_ROOT[keyName]+12); [0,4,7,12].forEach((s,i)=>setTimeout(()=>softTone(root*Math.pow(2,s/12),0.4,0.18),i*90)); }
+
+/* ===================== Slice 4: 伴奏 — 親密 pad + 極輕拍點 ===================== */
+let backingOn=true, curBacking=null;
+/* 非歌曲音型 → 依和弦質地鋪一床 pad(相對 root R 的半音偏移),每小節重彈 */
+const PAD_REL={ majtri:[0,4,7], mintri:[0,3,7], maj7:[0,4,7,11], dom7:[0,4,7,10], min7:[0,3,7,10],
+  scale:[0,4,7,11], thirds:[0,4,7], leapsfifth:[0,4,7], semi:[0,7], random:[0,4,7] };
+/* 歌曲 → 真實進行(絕對 midi,跟落下的音符同源)。ev = [起始拍, [和弦音]] */
+const BACKING={
+  seasons:{loop:16, ev:[[0,[50,54,57,61]],[4,[50,54,57,60]],[8,[55,59,62,66]],[12,[55,58,62,64]]]},
+  mylove: {loop:14, ev:[[0,[57,61,64,68]],[4,[49,53,56,59]],[8,[50,54,57]],[11,[50,53,57]]]},
+  dreamer:{loop:16, ev:[[0,[50,54,57,61]],[4,[55,59,62,66]],[8,[55,58,62,64]],[12,[57,61,64,67]]]},
+  homebody:{loop:16, ev:[[0,[52,56,59,63]],[4,[57,61,64,68]],[8,[52,56,59,63]],[12,[57,61,64,68]]]},
+  fang23:{loop:16, ev:[[0,[48,52,55,59]],[4,[48,52,55,58]],[8,[53,57,60,64]],[12,[53,56,60,62]]]}
+};
+function withBass(ch){ const b=ch[0]-12; return ch.indexOf(b)<0 ? [b].concat(ch) : ch.slice(); }
+function getBacking(patKey,R){
+  if(BACKING[patKey]) return { loop:BACKING[patKey].loop, ev:BACKING[patKey].ev.map(e=>[e[0],withBass(e[1])]) };
+  const rel=PAD_REL[patKey]||[0,4,7];
+  return { loop:4, ev:[[0, withBass(rel.map(o=>R+o))]] };
+}
+/* pad 音色:慢起音、長尾、少泛音、低音量 — 跟 softTone 共用 reverb bus 但不動它 */
+function padTone(freq, dur, peak, when){
+  ensureCtx(); const t=Math.max(audioCtx.currentTime, when||0); peak=peak||0.05;
+  const out=audioCtx.createGain(); out.gain.value=1; out.connect(masterDry); out.connect(reverbSend);
+  [[1,1],[2,0.4],[3,0.16]].forEach(function(p){
+    const o=audioCtx.createOscillator(); o.type="sine"; o.frequency.value=freq*p[0]*(1+0.0006*p[0]);
+    const g2=audioCtx.createGain(), a=peak*p[1];
+    g2.gain.setValueAtTime(0.0001,t);
+    g2.gain.exponentialRampToValueAtTime(a, t+0.18);
+    g2.gain.setValueAtTime(a, t+Math.max(0.22,dur*0.5));
+    g2.gain.exponentialRampToValueAtTime(0.0001, t+dur+0.45);
+    o.connect(g2); g2.connect(out); o.start(t); o.stop(t+dur+0.7);
+  });
+}
+function padChord(midis, beats, when){ const dur=beats*(60/bpm); midis.forEach((m,i)=>padTone(midiToFreq(m), dur, i===0?0.052:0.036, when)); }
+/* 極輕拍點:濾過的 brush 噪點;小節頭再加一個很軟的低 thump(不是 kick) */
+function brush(accent, when){
+  ensureCtx(); const t=Math.max(audioCtx.currentTime, when||0);
+  const nlen=Math.floor(audioCtx.sampleRate*0.06), nbuf=audioCtx.createBuffer(1,nlen,audioCtx.sampleRate), nd=nbuf.getChannelData(0);
+  for(let i=0;i<nlen;i++) nd[i]=(Math.random()*2-1)*(1-i/nlen);
+  const ns=audioCtx.createBufferSource(); ns.buffer=nbuf;
+  const bp=audioCtx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=accent?2600:5200; bp.Q.value=0.6;
+  const g2=audioCtx.createGain(), a=accent?0.05:0.026;
+  g2.gain.setValueAtTime(a,t); g2.gain.exponentialRampToValueAtTime(0.0001, t+(accent?0.12:0.07));
+  ns.connect(bp); bp.connect(g2); g2.connect(masterDry); g2.connect(reverbSend); ns.start(t); ns.stop(t+0.1);
+  if(accent){ const o=audioCtx.createOscillator(), og=audioCtx.createGain(); o.type="sine";
+    o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(74,t+0.12);
+    og.gain.setValueAtTime(0.048,t); og.gain.exponentialRampToValueAtTime(0.0001,t+0.16);
+    o.connect(og); og.connect(masterDry); o.start(t); o.stop(t+0.18); }
+}
+function chordBeatsAt(pos){
+  const bs=curBacking.ev.map(e=>e[0]).slice().sort((a,b)=>a-b); const idx=bs.indexOf(pos);
+  if(idx<0) return 4; const next=(idx+1<bs.length)?bs[idx+1]:curBacking.loop+bs[0]; return next-pos;
+}
+function playBacking(ci, when){
+  if(!curBacking) return; const pos=((ci-LEAD)%curBacking.loop+curBacking.loop)%curBacking.loop;
+  const ev=curBacking.ev.find(e=>e[0]===pos);
+  if(ev) padChord(ev[1], chordBeatsAt(pos), when);
+  brush(pos%4===0, when);
+}
+
+/* ===================== 聽力練習 (ear training) — 折進 PITCH BARD,共用 softTone + Bard XP ===================== */
+const EAR_LEVELS={
+  basic:{ name:"大調 / 小調", choices:[
+    {id:"maj",label:"大三和弦",rel:[0,4,7]},
+    {id:"min",label:"小三和弦",rel:[0,3,7]} ]},
+  sevenths:{ name:"七和弦色彩", choices:[
+    {id:"maj",label:"大三",rel:[0,4,7]},
+    {id:"min",label:"小三",rel:[0,3,7]},
+    {id:"maj7",label:"maj7",rel:[0,4,7,11]},
+    {id:"dom7",label:"屬7",rel:[0,4,7,10]},
+    {id:"min7",label:"min7",rel:[0,3,7,10]} ]}
+};
+const EAR_INFO={
+  maj:{f:"1·3·5",feel:"明亮、像家"},
+  min:{f:"1·♭3·5",feel:"憂鬱、柔"},
+  maj7:{f:"1·3·5·7",feel:"漂浮、夢幻(Laufey 的甜)"},
+  dom7:{f:"1·3·5·♭7",feel:"想往前解決的張力"},
+  min7:{f:"1·♭3·5·♭7",feel:"慵懶、爵士(neo-soul)"}
+};
+let earLevel="basic", earChord=null, earAnswered=false, earStreakNow=0;
+function renderEarStats(){ $("earStreak").textContent=earStreakNow; $("earTotal").textContent=RPG.earCorrect||0; }
+function awardEar(correct){
+  if(!correct){ earStreakNow=0; return 0; }
+  earStreakNow++; if(earStreakNow>(RPG.earBest||0)) RPG.earBest=earStreakNow;
+  RPG.earCorrect=(RPG.earCorrect||0)+1;
+  const xp=30+10*Math.min(earStreakNow,5); RPG.xp+=xp;
+  const t=dayKey();
+  if(RPG.lastDay!==t){ const y=new Date(); y.setDate(y.getDate()-1); RPG.streak=(RPG.lastDay===dayKey(y))?(RPG.streak||0)+1:1; RPG.lastDay=t; }
+  saveRPG(); renderChip(); chipGain(); return xp;
+}
+function playEarChord(){ if(!earChord) return; const ns=earChord.def.rel.map(o=>earChord.root+o);
+  ns.forEach((m,i)=> setTimeout(()=> softTone(midiToFreq(m),1.3,0.34), i*120)); }
+function earRenderChoices(){ const cs=EAR_LEVELS[earLevel].choices;
+  $("earChoices").innerHTML=cs.map(c=>'<button class="ear-choice" data-id="'+c.id+'">'+c.label+'</button>').join("");
+  $("earChoices").querySelectorAll(".ear-choice").forEach(b=>b.onclick=()=>earGuess(b.dataset.id)); }
+function earNew(){ const cs=EAR_LEVELS[earLevel].choices;
+  earChord={def:cs[Math.floor(Math.random()*cs.length)], root:48+Math.floor(Math.random()*8)};
+  earAnswered=false;
+  $("earFeedback").textContent=""; $("earFeedback").className="earfeedback";
+  $("earPrompt").textContent="聽… 這是哪個和弦?";
+  earRenderChoices();
+  $("earGo").style.display="none"; $("earNext").style.display="none"; $("earReplay").style.display="inline-block";
+  playEarChord(); }
+function earGuess(id){ if(earAnswered||!earChord) return; earAnswered=true;
+  const def=earChord.def, ok=(id===def.id), info=EAR_INFO[def.id]||{f:"",feel:""};
+  $("earChoices").querySelectorAll(".ear-choice").forEach(b=>{ b.disabled=true;
+    if(b.dataset.id===def.id) b.classList.add("right"); else if(b.dataset.id===id) b.classList.add("wrong"); });
+  const stg=document.querySelector(".earstage");
+  if(ok){ const xp=awardEar(true); sfxHit(1); $("earFeedback").className="earfeedback ok";
+    $("earFeedback").innerHTML="✓ 對!"+def.label+" = "+info.f+" · "+info.feel+"　<b>+"+xp+" XP</b>";
+    const sp=document.createElement("span"); sp.className="earpop"; sp.textContent="+"+xp+" ♪";
+    sp.style.left=(32+Math.random()*36)+"%"; sp.style.setProperty("--r",(Math.random()*16-8)+"deg");
+    stg.appendChild(sp); setTimeout(()=>sp.remove(),1050); bump($("earStreak")); }
+  else { awardEar(false); sfxMiss(); $("earFeedback").className="earfeedback no";
+    stg.classList.remove("shake"); void stg.offsetWidth; stg.classList.add("shake");
+    $("earFeedback").innerHTML="✗ 是 "+def.label+"("+info.f+" · "+info.feel+")。重聽一次,把這個聲音記住。"; }
+  renderEarStats(); $("earNext").style.display="inline-block"; }
+const TAGLINES={game:"一串音往你這邊跑來，唱準它。",free:"隨便哼一個音，鏡子跟著你走。",ear:"閉上眼睛聽——耳朵是第一件樂器。",theory:"翻一翻：你的聲音是怎麼搭起來的。"};
+function micAttn(){ micBtn.classList.toggle("attn", !micOn && (mode==="game"||mode==="free")); }
+function applyMode(){
+  const gm=mode==="game", ea=mode==="ear", th=mode==="theory", panel=ea||th;
+  $("tagline").innerHTML=(TAGLINES[mode]||TAGLINES.game)+' <span class="cur">_</span>';
+  $("gameBar").style.display=gm?"flex":"none"; $("scoreBar").style.display=gm?"flex":"none";
+  document.querySelector(".readout").style.display=panel?"none":"grid";
+  document.querySelector(".stage").style.display=panel?"none":"";
+  document.querySelector(".controls").style.display=panel?"none":"flex";
+  document.querySelector(".tips").style.display=panel?"none":"";
+  $("earPanel").style.display=ea?"flex":"none";
+  $("theoryPanel").style.display=th?"flex":"none";
+  if(!gm){ gameActive=false; notes=[]; endScreen.classList.remove("show"); }
+  if(panel && micOn) stopMic();   // 聽辨/講解 藏了麥克風控制,就別讓它繼續錄(隱私 + 省電)
+  if(ea) renderEarStats();
+  if(th) renderTheory();
+  micAttn();
+  if(!panel) draw();   // 回到 game/free 重畫(含空狀態)
+}
+$("earGo").onclick=earNew; $("earNext").onclick=earNew; $("earReplay").onclick=playEarChord;
+$("earLevel").onchange=e=>{ earLevel=e.target.value; earChord=null; earAnswered=false;
+  $("earPrompt").textContent="按 ▶ 出題。"; $("earChoices").innerHTML=""; $("earFeedback").textContent="";
+  $("earGo").style.display="inline-block"; $("earNext").style.display="none"; $("earReplay").style.display="none"; };
+
+/* ===================== 樂理講解 (theory) — 從 AJ 的歌長出來,聲音優先 ===================== */
+const THEORY=[
+ { sym:"1 · 3 · 5", t:"和弦 = 從音階疊出來的",
+   body:"大調音階七個音(Do Re Mi Fa Sol La Ti)。和弦不是亂按——是「跳著挑」:第 1、3、5 個音疊起來 = 大三和弦。所有和聲的地基。",
+   song:"你每首歌底下都是這個。",
+   plays:[ {label:"🔊 先聽 D 大調音階", spell:"D E F♯ G A B C♯ D", notes:[50,52,54,55,57,59,61,62], mode:"melody"},
+           {label:"🔊 挑 1·3·5 = D 大三", spell:"D F♯ A", notes:[50,54,57], mode:"chord"} ] },
+ { sym:"I ii iii IV V vi", t:"家人和弦:一個調有哪些「自己人」",
+   body:"把一個調的音階,每個音都往上疊 1·3·5,就得到這個調的「家人」和弦。D 大調的家人:I=D、ii=Em、iii=F♯m、IV=G、V=A、vi=Bm。好記規律:大寫 I IV V = 大三,小寫 ii iii vi = 小三。這幾個就是 D 大調「不會錯」的和弦。",
+   song:"你愛的歌九成都在這個家裡轉——seasons、My Love、Dreamer 的骨架都是這幾個。",
+   plays:[ {label:"🔊 I = D 大", spell:"D F♯ A", notes:[50,54,57], mode:"chord"},
+           {label:"🔊 IV = G 大", spell:"G B D", notes:[55,59,62], mode:"chord"},
+           {label:"🔊 V = A 大", spell:"A C♯ E", notes:[57,61,64], mode:"chord"},
+           {label:"🔊 vi = B 小", spell:"B D F♯", notes:[59,62,66], mode:"chord"} ] },
+ { sym:"1 · 3 · 5 · 7", t:"加第七個音 = 你的甜味 (maj7)",
+   body:"在大三(1·3·5)上再疊一個音(第 7 度)= maj7。差別只有「一個音」:多了 C♯。那個 7 度讓它「漂浮、不落地」。對一下底下組成音。",
+   song:"seasons 開頭 Dmaj7、homebody 整首、Laufey 全部——你耳朵早就愛這個甜。",
+   plays:[ {label:"🔊 D 大三", spell:"D F♯ A", notes:[50,54,57], mode:"chord"},
+           {label:"🔊 → Dmaj7", spell:"D F♯ A C♯", notes:[50,54,57,61], mode:"chord"} ] },
+ { sym:"大調 ↔ 平行小調", t:"什麼是「借用」?借隔壁的客人",
+   body:"借用 = 暫時用一個「不屬於你這個調」的和弦,從別的調借來,用完馬上回家。最常借的對象 = 平行小調(同一個根音、換成小調)。D 大 ↔ D 小,同一個家、不同心情。D 大調的 IV 是 G 大(家人);跟 D 小調借,就拿到 G 小(客人)——那個「外人音」就是 B♭。懂這個,♭VII、♭VI 那些借用全是同一招。",
+   song:"(注意:是「平行」小調 = 同根音 D 小,不是「關係」小調 B 小。)亮的調裡借一塊小調陰影、嘆口氣再回家——就是下一頁 seasons 在做的事。",
+   plays:[ {label:"🔊 IV = G 大(家人·亮)", spell:"G B D", notes:[55,59,62], mode:"chord"},
+           {label:"🔊 借來的 iv = G 小(客人·暗)", spell:"G B♭ D", notes:[55,58,62], mode:"chord"} ] },
+ { sym:"IV → iv", t:"你的第一簽名:借用小調 iv(嘆氣)",
+   body:"上一頁學的「借用」,seasons 用的是「加味版」Gmaj7→Gm6,所以其實「兩個音」在動:B→B♭(第 3 音,大變小 = 嘆氣主角)＋ F♯→E(maj7 的 7 變成 6)。對一下底下組成音就看到了。",
+   song:"seasons 的 Gmaj7→Gm6、Dreamer 一樣、My Love 的 D→Dm、Bruno Major〈Home〉、方大同〈才二十三〉(你 #1 重播,同一招低一個全音!)。這是你最常被電到的一招。",
+   plays:[ {label:"🔊 Gmaj7(亮)", spell:"G B D F♯", notes:[55,59,62,66], mode:"chord"},
+           {label:"🔊 → Gm6(暗一下 = 嘆氣)", spell:"G B♭ D E", notes:[55,58,62,64], mode:"chord"} ] },
+ { sym:"1 · 3 · 5 · ♭7", t:"屬七 = 想往前的力",
+   body:"把 maj7 的第 7 音再降半音(C♯→C)= 屬7。一樣只動「一個音」,但它不甜了,變「癢、想解決、往前推」。流行/爵士一半的動力來自這個「想走」。",
+   song:"seasons 第一→第二個和弦,就是 maj7→屬7(Dmaj7→D7)。這就是你聽辨分不太出來的那兩個——現在你有對照了。",
+   plays:[ {label:"🔊 Dmaj7(甜、停住)", spell:"D F♯ A C♯", notes:[50,54,57,61], mode:"chord"},
+           {label:"🔊 → D7(癢、想走)", spell:"D F♯ A C", notes:[50,54,57,60], mode:"chord"} ] },
+ { sym:"I · IV · V …", t:"度數食譜:羅馬數字 = 換調自由",
+   body:"和弦用「在音階第幾度」命名(I、IV、V…),大寫=大三、小寫=小三。記度數、不記和弦名,就能把同一首歌搬到任何適合你嗓子的調。",
+   song:"seasons = Imaj7–I7–IVmaj7–iv6。Dreamer 跟它「同一招」,就是因為度數一樣(Imaj7→IVmaj7→iv6),只是音不同。",
+   plays:[ {label:"🔊 seasons 全段", spell:"Dmaj7 → D7 → Gmaj7 → Gm6", chords:[[50,54,57,61],[50,54,57,60],[55,59,62,66],[55,58,62,64]]} ] }
+];
+let thIdx=0;
+function theorySound(spec, btn){
+  ensureCtx();
+  if(spec.chords){ spec.chords.forEach((ch,ci)=> ch.forEach((m,i)=> setTimeout(()=> softTone(midiToFreq(m),1.0,0.3), ci*720+i*70)) ); }
+  else if(spec.mode==="melody"){ spec.notes.forEach((m,i)=> setTimeout(()=> softTone(midiToFreq(m),0.5,0.34), i*230)); }
+  else { spec.notes.forEach((m,i)=> setTimeout(()=> softTone(midiToFreq(m),1.4,0.32), i*110)); }
+  if(btn){ const ms = spec.chords ? spec.chords.length*720+900 : (spec.mode==="melody" ? spec.notes.length*230+450 : 1400);
+    btn.classList.add("playing"); setTimeout(()=>btn.classList.remove("playing"), ms); }
+}
+function renderTheory(){
+  const c=THEORY[thIdx];
+  $("thPage").textContent=(thIdx+1)+" / "+THEORY.length;
+  $("thSym").textContent=c.sym; $("thTitle").textContent=c.t; $("thBody").textContent=c.body;
+  $("thSong").textContent="🎵 你的歌:"+c.song;
+  $("thPlays").innerHTML=c.plays.map((p,i)=>'<div class="tplaywrap"><button class="tplay" data-i="'+i+'">'+p.label+'</button>'+(p.spell?'<span class="tspell">'+p.spell+'</span>':'')+'</div>').join("");
+  $("thPlays").querySelectorAll(".tplay").forEach(b=>b.onclick=()=>theorySound(c.plays[+b.dataset.i], b));
+  $("thPrev").style.visibility=thIdx>0?"visible":"hidden";
+  $("thNext").textContent= thIdx<THEORY.length-1 ? "下一個 ▶" : "↺ 從頭再看";
+}
+$("thPrev").onclick=()=>{ if(thIdx>0){ thIdx--; renderTheory(); } };
+$("thNext").onclick=()=>{ thIdx=(thIdx+1)%THEORY.length; renderTheory(); };
+
+/* ===================== mic (verified, unchanged) ===================== */
+async function startMic(){
+  try{
+    statusEl.className="status"; statusEl.textContent="正在開啟麥克風…";
+    ensureCtx(); if(audioCtx.state==="suspended") await audioCtx.resume();
+    micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:false,autoGainControl:false}});
+    const src=audioCtx.createMediaStreamSource(micStream);
+    analyser=audioCtx.createAnalyser(); analyser.fftSize=2048; buf=new Float32Array(analyser.fftSize); src.connect(analyser);
+    micOn=true; micBtn.textContent="■ 關麥克風"; micBtn.classList.add("on"); statusEl.textContent="聽到你了 · LISTENING"; micAttn();
+    if(!rafId) loop();
+  }catch(e){ statusEl.className="status err"; statusEl.textContent="麥克風打不開："+(e&&e.name?e.name:e)+"。file:// 權限問題就跟我說，用 localhost。"; micOn=false; micBtn.textContent="🎤 開麥克風"; micBtn.classList.remove("on"); }
+}
+function stopMic(){ micOn=false; if(rafId) cancelAnimationFrame(rafId); rafId=null; gameActive=false; if(micStream) micStream.getTracks().forEach(t=>t.stop()); micBtn.textContent="🎤 開麥克風"; micBtn.classList.remove("on"); statusEl.textContent="已停止 · STOPPED"; micAttn(); noteBig.classList.remove("live"); noteBig.textContent="—"; hzEl.textContent="— Hz"; }
+micBtn.onclick=()=>micOn?stopMic():startMic();
+
+/* ===================== game: arcade scoring ===================== */
+function multOf(c){ return Math.min(8, 1+Math.floor(c/4)); }
+function setMult(){ $("scMult").textContent="×"+multOf(combo); }
+async function startRun(){
+  endScreen.classList.remove("show");
+  if(!micOn){ await startMic(); if(!micOn) return; }
+  const pat=PATTERNS[$("patSel").value].build(), R=GAME_ROOT[keyName];
+  curBacking=getBacking($("patSel").value, R);
+  let b=LEAD;
+  notes=pat.map(p=>{ const midi=(p.abs!=null)?p.abs:R+p.off; const n={midi,startBeat:b,beats:1,tP:0,tG:0,tO:0,done:false,judge:null,cued:false}; b+=1; return n; });
+  scTotal=notes.length; score=0; combo=0; best=0; hitCount=0; lastTick=-1; lastBeatInt=-1;
+  judgeCount={PERFECT:0,GREAT:0,GOOD:0,MISS:0};
+  $("scScore").textContent="0"; $("scCombo").textContent="0"; $("scBest").textContent="0"; $("scHit").textContent="0/"+scTotal; setMult();
+  popups.length=0; sparks.length=0;
+  gameStartT=audioCtx.currentTime; lastNow=gameStartT; gameActive=true;
+  goBtn.textContent="■ STOP"; goBtn.classList.add("stop");
+  statusEl.className="status"; statusEl.textContent="READY…";
+}
+function endRun(){
+  gameActive=false; goBtn.textContent="▶ START"; goBtn.classList.remove("stop");
+  const perf = scTotal ? Math.round((judgeCount.PERFECT*100+judgeCount.GREAT*60+judgeCount.GOOD*30)/(scTotal*100)*100) : 0;
+  const grade = perf>=95?"S":perf>=80?"A":perf>=65?"B":perf>=45?"C":"D";
+  const msgs={S:"PERFECT PITCH. 你的耳朵跟嗓子同一條線。",A:"很穩。再快一點？",B:"抓到感覺了，多幾輪更準。",C:"放慢速度，把音聽清楚再唱。",D:"降速度、開提示音，一個音一個音來。"};
+  $("egGrade").textContent=grade;
+  const xpGained=awardRound(perf, score);
+  $("egStat").innerHTML="SCORE <b>"+score+"</b> · "+hitCount+"/"+scTotal+" 命中 ("+perf+"%) · <b>+"+xpGained+" XP</b>";
+  $("egMsg").textContent=msgs[grade]+(canLevelUp()?"　🎭 可升級！點上方 Bard 條":"");
+  endScreen.classList.add("show"); sfxEnd();
+  if($("autoChk").checked) setTimeout(()=>{ if(!gameActive) startRun(); }, 1900);
+}
+goBtn.onclick=()=>{ if(gameActive){ gameActive=false; endScreen.classList.remove("show"); goBtn.textContent="▶ START"; goBtn.classList.remove("stop"); } else openDeck(); };
+$("egAgain").onclick=()=>startRun();
+$("egOther").onclick=()=>{ endScreen.classList.remove("show"); $("patSel").focus(); };
+window.addEventListener("keydown",e=>{ if(e.key==="Enter" && endScreen.classList.contains("show")){ e.preventDefault(); startRun(); } });
+
+/* lesson cards (Slice 2): ▶ START 先翻卡 → READY 才開始這輪 */
+const lessonDeck=$("lessonDeck"); let curLesson=[], deckIdx=0;
+function openDeck(){ curLesson=LESSONS[$("patSel").value]||[]; if(!curLesson.length){ startRun(); return; } deckIdx=0; renderDeck(); lessonDeck.classList.add("show"); }
+function renderDeck(){ const c=curLesson[deckIdx], last=deckIdx===curLesson.length-1;
+  $("dPage").textContent=(deckIdx+1)+" / "+curLesson.length;
+  $("dCards").innerHTML='<div class="dtag">'+c.tag+'</div><div class="dtitle">'+c.t+'</div><div class="dbody">'+c.b+'</div>';
+  $("dPrev").style.visibility=deckIdx>0?"visible":"hidden";
+  $("dNext").style.display=last?"none":"inline-block"; $("dReady").style.display=last?"inline-block":"none";
+  const dc=$("dCards"); dc.classList.remove("flip"); void dc.offsetWidth; dc.classList.add("flip"); }
+function deckNext(){ if(deckIdx<curLesson.length-1){ deckIdx++; renderDeck(); } else { lessonDeck.classList.remove("show"); startRun(); } }
+$("dNext").onclick=deckNext;
+$("dPrev").onclick=()=>{ if(deckIdx>0){ deckIdx--; renderDeck(); } };
+$("dReady").onclick=()=>{ lessonDeck.classList.remove("show"); startRun(); };
+$("dSkip").onclick=()=>{ lessonDeck.classList.remove("show"); startRun(); };
+window.addEventListener("keydown",e=>{ if(!lessonDeck.classList.contains("show")) return; if(e.key==="ArrowRight"||e.key==="Enter"){ e.preventDefault(); deckNext(); } else if(e.key==="ArrowLeft"){ e.preventDefault(); if(deckIdx>0){ deckIdx--; renderDeck(); } } });
+
+/* ===================== Slice 3: Bard 升級系統 ===================== */
+const RPGKEY="pitchbard_rpg";
+const BARD_LV=[
+  {n:"哼唱者",toNext:1500,ms:"起步 — 先把音準感找回來。"},
+  {n:"吹口哨",toNext:2500,ms:"穩定中 — 簡單音型先唱順。"},
+  {n:"低吟者",toNext:5000,ms:"≈ 3 個月里程碑 — 和弦走向開始聽得到。"},
+  {n:"鳴禽",toNext:9000,ms:"maj7 / 屬七的味道你抓得住了。"},
+  {n:"歌者",toNext:17000,ms:"≈ 6 個月 — 能自信地自彈自唱。"},
+  {n:"大師",toNext:25000,ms:"表達 > 技術，聲音開始有你。"},
+  {n:"宗師",toNext:Infinity,ms:"≈ 12 個月 — 聲音有辨識度，表演不再是障礙。"}
+];
+let RPG=loadRPG(), eggActive=false;
+function loadRPG(){ try{ return Object.assign({xp:0,level:1,streak:0,lastDay:null,stars:{},learned:[],earCorrect:0,earBest:0}, JSON.parse(localStorage.getItem(RPGKEY))||{}); }catch(e){ return {xp:0,level:1,streak:0,lastDay:null,stars:{},learned:[],earCorrect:0,earBest:0}; } }
+function saveRPG(){ try{ localStorage.setItem(RPGKEY, JSON.stringify(RPG)); }catch(e){} }
+function lvInfo(){ return BARD_LV[Math.min(RPG.level-1, BARD_LV.length-1)]; }
+function toNext(){ return lvInfo().toNext; }
+function canLevelUp(){ return RPG.level<BARD_LV.length && RPG.xp>=toNext(); }
+function dayKey(d){ d=d||new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+function awardRound(perf, sc){
+  const xp=Math.max(10, Math.round(sc)); RPG.xp+=xp;
+  const t=dayKey();
+  if(RPG.lastDay!==t){ const y=new Date(); y.setDate(y.getDate()-1); RPG.streak=(RPG.lastDay===dayKey(y))?(RPG.streak||0)+1:1; RPG.lastDay=t; }
+  const pid=$("patSel").value, st=perf>=90?3:perf>=70?2:perf>=45?1:0;
+  RPG.stars[pid]=Math.max(RPG.stars[pid]||0, st);
+  if(RPG.learned.indexOf(pid)<0) RPG.learned.push(pid);
+  saveRPG(); renderChip(); chipGain(); return xp;
+}
+function totalStars(){ var s=0; for(var k in RPG.stars) s+=RPG.stars[k]; return s; }
+function renderChip(){
+  $("bcLv").textContent="Lv."+RPG.level; $("bcTitle").textContent=lvInfo().n; $("bcStreak").textContent="🔥"+(RPG.streak||0);
+  $("bcXpFill").style.width=(toNext()===Infinity?100:Math.min(100,RPG.xp/toNext()*100))+"%";
+  $("bardChip").classList.toggle("ready", canLevelUp());
+  $("bcStreak").classList.toggle("hot",(RPG.streak||0)>0);
+}
+function chipGain(){ const ch=$("bardChip"); ch.classList.remove("gain"); void ch.offsetWidth; ch.classList.add("gain"); }
+function renderScreen(){
+  const lv=lvInfo();
+  $("bsChar").innerHTML = eggActive ? catSVG() : bardSVG(RPG.level);
+  $("bsName").textContent = eggActive ? "野生酷貓 🕶️" : lv.n;
+  $("bsLv").innerHTML="lv. "+RPG.level+" <span>("+RPG.xp+" exp)</span>";
+  const need=toNext(); $("bsXpFill").style.width=(need===Infinity?100:Math.min(100,RPG.xp/need*100))+"%";
+  $("bsXpLo").textContent="0 exp"; $("bsXpHi").textContent=(need===Infinity?"MAX":need+" exp");
+  $("bsStreak").textContent=RPG.streak||0; $("bsStars").textContent=totalStars(); $("bsKnow").textContent=RPG.learned.length+"/"+Object.keys(PATTERNS).length;
+  $("bsMs").textContent = eggActive ? "✦ 彩蛋!野生酷貓亂入 — 關掉再開就回到你的 Bard。" : lv.ms;
+  const lu=$("bsLevelUp"); lu.disabled=!canLevelUp(); lu.classList.toggle("ready",canLevelUp());
+}
+$("bardChip").onclick=()=>{ eggActive = Math.random()<0.12; renderScreen(); $("bardScreen").classList.add("show"); };
+$("bsClose").onclick=()=>$("bardScreen").classList.remove("show");
+$("bsLevelUp").onclick=()=>{ if(!canLevelUp())return; RPG.xp-=toNext(); RPG.level++; eggActive=false; saveRPG(); renderChip(); renderScreen(); const ch=$("bsChar"); ch.classList.remove("pulse"); void ch.offsetWidth; ch.classList.add("pulse"); sfxCombo(6);
+  const card=document.querySelector(".bs-card"), CONF=["♪","♫","★","✦","♩"];
+  for(let i=0;i<26;i++){ const c=document.createElement("span"); c.className="confetti"; c.textContent=CONF[i%CONF.length];
+    const a=Math.random()*6.283, d=70+Math.random()*130;
+    c.style.setProperty("--dx",(Math.cos(a)*d)+"px"); c.style.setProperty("--dy",(Math.sin(a)*d-70)+"px");
+    c.style.setProperty("--rr",(Math.random()*260-130)+"deg"); c.style.animationDelay=(Math.random()*0.12)+"s";
+    card.appendChild(c); setTimeout(()=>c.remove(),1500); } };
+/* Humation-style 塗鴉角色,髮型/配件隨等級變 */
+function bardSVG(level){
+  const look = level<=2?0 : level<=4?1 : level<=6?2 : 3;
+  const hairs=[
+    '<g fill="#16150f" stroke="none"><circle cx="60" cy="48" r="13"/><circle cx="80" cy="40" r="16"/><circle cx="100" cy="48" r="13"/><circle cx="80" cy="46" r="17"/></g>',
+    '<g fill="#16150f" stroke="none"><circle cx="54" cy="50" r="14"/><circle cx="70" cy="36" r="15"/><circle cx="90" cy="36" r="15"/><circle cx="106" cy="50" r="14"/><circle cx="80" cy="42" r="18"/></g>',
+    '<g fill="#16150f" stroke="none"><circle cx="62" cy="46" r="11"/><circle cx="76" cy="38" r="12"/><circle cx="92" cy="42" r="11"/><circle cx="84" cy="35" r="10"/><circle cx="70" cy="44" r="10"/></g>',
+    '<g fill="#16150f" stroke="none"><circle cx="50" cy="50" r="14"/><circle cx="64" cy="34" r="15"/><circle cx="80" cy="28" r="16"/><circle cx="96" cy="34" r="15"/><circle cx="110" cy="50" r="14"/><circle cx="80" cy="40" r="19"/></g>'
+  ];
+  let acc="";
+  if(level>=7) acc+='<path d="M66 20 L72 8 L80 18 L88 8 L94 20" fill="none" stroke="#16150f" stroke-width="3" stroke-linejoin="round"/>';
+  const notes='<g font-family="Georgia,serif" font-size="20" fill="#16150f" stroke="none"><text x="14" y="74">♪</text><text x="130" y="60">♫</text>'+(level>=4?'<text x="16" y="122">♬</text>':'')+'</g>';
+  return '<svg viewBox="0 0 160 200" width="150" height="188">'+
+    '<g filter="url(#rough)">'+
+    '<path d="M48 198 Q44 152 66 118 L73 110 Q80 120 87 110 L94 118 Q116 152 112 198 Z" fill="#fffefb" stroke="#16150f" stroke-width="3" stroke-linejoin="round"/>'+
+    '<path d="M73 110 L80 124 L87 110" fill="none" stroke="#16150f" stroke-width="3" stroke-linejoin="round"/>'+
+    '<path d="M73 88 L73 112 M87 88 L87 112" fill="none" stroke="#16150f" stroke-width="3"/>'+
+    hairs[look]+
+    '<ellipse cx="80" cy="64" rx="25" ry="27" fill="#fffefb" stroke="#16150f" stroke-width="3"/>'+
+    acc+'</g>'+
+    '<circle cx="71" cy="62" r="3" fill="#16150f"/><circle cx="89" cy="62" r="3" fill="#16150f"/>'+
+    '<ellipse cx="80" cy="76" rx="3.5" ry="5" fill="none" stroke="#16150f" stroke-width="2.5"/>'+
+    notes+'</svg>';
+}
+/* 彩蛋:酷貓 */
+function catSVG(){
+  return '<svg viewBox="0 0 160 200" width="150" height="188">'+
+    '<g filter="url(#rough)" stroke="#16150f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">'+
+    '<path d="M40 198 Q40 150 58 120 Q70 130 80 126 Q90 130 102 120 Q120 150 120 198 Z" fill="#16150f"/>'+
+    '<path d="M48 100 Q44 66 60 54 L58 26 L76 50 Q80 54 84 50 L102 26 L100 54 Q116 66 112 100 Q98 122 80 122 Q62 122 48 100 Z" fill="#fffefb"/>'+
+    '<path d="M62 32 L68 50 M98 32 L92 50" fill="none"/>'+
+    '<g fill="#16150f" stroke="none"><path d="M52 76 Q52 90 67 90 Q80 90 80 76 Q80 72 66 72 Q52 72 52 76 Z"/><path d="M80 76 Q80 90 95 90 Q108 90 108 76 Q108 72 94 72 Q80 72 80 76 Z"/></g>'+
+    '<line x1="78" y1="76" x2="82" y2="76"/>'+
+    '<path d="M77 96 L83 96 L80 100 Z" fill="#16150f" stroke="none"/>'+
+    '<path d="M80 100 Q74 106 69 102 M80 100 Q86 106 91 102" fill="none"/>'+
+    '<path d="M46 90 L28 86 M46 96 L28 99 M114 90 L132 86 M114 96 L132 99" fill="none"/>'+
+    '</g></svg>';
+}
+renderChip();
+
+function loop(){
+  if(!micOn){ rafId=null; return; }
+  analyser.getFloatTimeDomainData(buf);
+  const f=autoCorrelate(buf,audioCtx.sampleRate); liveMidi=null;
+  if(f>0){
+    const midi=freqToMidi(f), near=Math.round(midi), cents=(midi-near)*100; liveMidi=midi;
+    noteBig.classList.add("live"); noteBig.textContent=midiToName(near); hzEl.textContent=f.toFixed(1)+" Hz";
+    const cl=Math.max(-50,Math.min(50,cents)); centsMarker.style.left=(50+cl)+"%";
+    const it=Math.abs(cents)<=12; centsMarker.classList.toggle("intune",it);
+    verdict.className="verdict"+(it?" intune":""); verdict.textContent=it?"IN TUNE ✓":(cents<0?"FLAT ":"SHARP ")+Math.abs(Math.round(cents))+"¢";
+    if(rangeLo===null||midi<rangeLo){rangeLo=midi;$("rangeLo").textContent=midiToName(midi);}
+    if(rangeHi===null||midi>rangeHi){rangeHi=midi;$("rangeHi").textContent=midiToName(midi);}
+  } else noteBig.classList.remove("live");
+  trail.push(liveMidi); trail.shift();
+  if(gameActive) updateGame();
+  if(beatPulse>0) beatPulse-=0.06;
+  draw();
+  rafId=requestAnimationFrame(loop);
+}
+function updateGame(){
+  const now=audioCtx.currentTime, dt=now-lastNow; lastNow=now;
+  const spb=60/bpm, cb=(now-gameStartT)/spb;
+  const ci=Math.floor(cb);
+  if(cb<LEAD && ci>lastTick){ lastTick=ci; sfxTick(false); }
+  if(cb>=LEAD && lastTick<LEAD){ lastTick=LEAD; sfxTick(true); statusEl.textContent="SING!";
+    popups.push({x:cvs.width/2,y:cvs.height/2-30,life:34,text:"GO!",huge:true}); shakeT=Math.max(shakeT,4); }
+  if(ci>lastBeatInt){ lastBeatInt=ci; beatPulse=1;
+    if(backingOn && ci>=LEAD) playBacking(ci, gameStartT+ci*spb); }
+  notes.forEach(n=>{ if(!n.cued && cb>=n.startBeat-0.03){ n.cued=true; if($("cueChk").checked) softTone(midiToFreq(n.midi), Math.min(spb,0.75), 0.42); } });
+  notes.forEach(n=>{
+    if(n.done) return; const end=n.startBeat+n.beats;
+    if(cb>=n.startBeat && cb<end){
+      if(liveMidi!==null){ const dc=Math.abs((liveMidi-n.midi)*100); if(dc<=T_PERFECT) n.tP+=dt; else if(dc<=T_GREAT) n.tG+=dt; else if(dc<=T_GOOD) n.tO+=dt; }
+    } else if(cb>=end){
+      n.done=true; const need=n.beats*spb*0.30;
+      if(n.tP>=need) n.judge="PERFECT"; else if(n.tP+n.tG>=need) n.judge="GREAT"; else if(n.tP+n.tG+n.tO>=need) n.judge="GOOD"; else n.judge="MISS";
+      judgeCount[n.judge]++;
+      const y=midiToY(n.midi,cvs.height);
+      if(n.judge!=="MISS"){
+        combo++; if(combo>best){ best=combo; $("scBest").textContent=best; }
+        const base={PERFECT:100,GREAT:60,GOOD:30}[n.judge], m=multOf(combo);
+        score+=base*m; hitCount++;
+        bump($("scScore")); $("scScore").textContent=score; $("scCombo").textContent=combo; $("scHit").textContent=hitCount+"/"+scTotal; setMult();
+        popups.push({x:NOW_X,y:y,life:46,text:n.judge,big:n.judge==="PERFECT"});
+        for(let s2=0;s2<5;s2++) sparks.push(blob(NOW_X,y));
+        if(n.judge==="PERFECT"){ for(let s=0;s<10;s++) sparks.push(spark(NOW_X,y)); shakeT=7; }
+        sfxHit(n.judge==="PERFECT"?1:0);
+        if(combo>0 && combo%4===0){ popups.push({x:NOW_X,y:60,life:42,text:"COMBO ×"+m,big:false,top:true}); sfxCombo(combo/4); if(m>=8) shakeT=Math.max(shakeT,5); }
+      } else {
+        combo=0; $("scCombo").textContent=0; setMult();
+        popups.push({x:NOW_X,y:y,life:36,text:"MISS",big:false,miss:true}); sfxMiss();
+      }
+    }
+  });
+  const last=notes[notes.length-1];
+  if(last && cb>last.startBeat+last.beats+1.2) endRun();
+}
+function bump(el){ el.style.transform="scale(1.35)"; setTimeout(()=>el.style.transform="scale(1)",110); }
+function spark(x,y){ const a=Math.random()*6.28, sp=2+Math.random()*3; return {x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,life:30,rot:Math.random()*6.28,rs:(Math.random()-0.5)*0.3,sz:5+Math.random()*5}; }
+function blob(x,y){ return {x,y,vx:(Math.random()-0.5)*5,vy:-1.5-Math.random()*3,life:26,rot:0,rs:0,sz:2.5+Math.random()*4.5,blob:true}; }
+
+/* ===================== drawing (B&W doodle) ===================== */
+function midiToY(m,H){ return H-((m-MIDI_LO)/(MIDI_HI-MIDI_LO))*H; }
+function roughRect(x,y,w,h,r,jit,seed){ jit=jit||0; let k=(seed||1)*7.13; const j=()=>{ k+=1.37; const s=Math.sin(k)*43758.5453; return ((s-Math.floor(s))-0.5)*jit; };
+  g.beginPath(); g.moveTo(x+r+j(),y+j()); g.lineTo(x+w-r+j(),y+j()); g.arcTo(x+w,y,x+w,y+r,r); g.lineTo(x+w+j(),y+h-r+j()); g.arcTo(x+w,y+h,x+w-r,y+h,r); g.lineTo(x+r+j(),y+h+j()); g.arcTo(x,y+h,x,y+h-r,r); g.lineTo(x+j(),y+r+j()); g.arcTo(x,y,x+r,y,r); g.closePath(); }
+function star(cx,cy,sz){ g.beginPath(); for(let i=0;i<8;i++){ const a=i*Math.PI/4, rr=(i%2===0)?sz:sz*0.4; const x=cx+Math.cos(a)*rr, y=cy+Math.sin(a)*rr; i?g.lineTo(x,y):g.moveTo(x,y); } g.closePath(); }
+function draw(){
+  const W=cvs.width,H=cvs.height; g.clearRect(0,0,W,H);
+  g.save();
+  if(shakeT>0){ const m=shakeT*1.3; g.translate((Math.random()-0.5)*m,(Math.random()-0.5)*m); shakeT--; }
+  const pcs=MAJOR_PCS.map(iv=>(GAME_ROOT[keyName]+iv)%12);
+  for(let m=MIDI_LO;m<=MIDI_HI;m++){ const y=midiToY(m,H),pc=((m%12)+12)%12,ik=pcs.includes(pc);
+    g.strokeStyle=ik?"rgba(22,21,15,0.16)":"rgba(22,21,15,0.05)"; g.lineWidth=ik?1.3:1; g.beginPath(); g.moveTo(0,y); g.lineTo(W,y); g.stroke();
+    if(m%12===0||ik){ g.fillStyle="rgba(22,21,15,0.35)"; g.font="18px 'Space Mono',monospace"; g.fillText(midiToName(m),8,y-5); } }
+  // 空狀態:閒置的 canvas 不該是一片白,要是邀請
+  if((mode==="game"||mode==="free") && !gameActive && !notes.length){
+    g.save(); g.textAlign="center";
+    if(!micOn){
+      g.fillStyle="rgba(22,21,15,.8)"; g.font="800 54px 'Bricolage Grotesque','PingFang TC',sans-serif";
+      g.fillText(mode==="game"?"♪ 選一首歌，唱給我聽":"♪ 哼一個音，鏡子跟著你",W/2,H/2-26);
+      g.fillStyle="rgba(22,21,15,.48)"; g.font="22px 'Space Mono','PingFang TC',monospace";
+      g.fillText(mode==="game"?"🎤 開麥克風 → 選音型 → ▶ START（或按空白鍵）":"🎤 開麥克風就開始",W/2,H/2+26);
+    } else if(mode==="game"){
+      g.fillStyle="rgba(22,21,15,.42)"; g.font="700 26px 'Space Mono',monospace";
+      g.fillText("READY — ▶ START 或按空白鍵",W/2,52);
+    }
+    g.fillStyle="rgba(22,21,15,.16)"; g.font="44px Georgia,serif";
+    g.fillText("♫",W-80,84); g.fillText("♪",70,H-52);
+    g.restore(); g.textAlign="left";
+  }
+  if(audioCtx && (gameActive||notes.length)){
+    const spb=60/bpm, cb=(audioCtx.currentTime-gameStartT)/spb;
+    g.strokeStyle="rgba(22,21,15,"+(0.55+beatPulse*0.4)+")"; g.lineWidth=2+beatPulse*2; g.setLineDash([9,7]); g.beginPath(); g.moveTo(NOW_X,0); g.lineTo(NOW_X,H); g.stroke(); g.setLineDash([]);
+    notes.forEach(n=>{ const x=NOW_X+(n.startBeat-cb)*PX_PER_BEAT, w=n.beats*PX_PER_BEAT-10, y=midiToY(n.midi,H); if(x>W||x+w<0) return;
+      const active=cb>=n.startBeat&&cb<n.startBeat+n.beats, onIt=active&&liveMidi!==null&&Math.abs((liveMidi-n.midi)*100)<=T_GOOD;
+      const filled = (n.done&&n.judge!=="MISS") || onIt || active;
+      g.lineWidth=2; g.strokeStyle="#16150f";
+      if(n.done&&n.judge==="MISS"){ g.setLineDash([4,4]); g.fillStyle="rgba(22,21,15,0.06)"; roughRect(x,y-11,Math.max(w,12),22,8,1.5,n.startBeat); g.fill(); g.stroke(); g.setLineDash([]); }
+      else { g.fillStyle=filled?"#16150f":"#fffefb"; roughRect(x,y-11,Math.max(w,12),22,8,onIt?2.2:1.2,n.startBeat); g.fill(); g.stroke(); }
+      g.fillStyle=filled?"#fffefb":"#16150f"; g.font="14px 'Space Mono',monospace"; g.fillText(midiToName(n.midi),x+5,y+4);
+    });
+    if(cb<LEAD){ const num=Math.max(1,Math.ceil(LEAD-cb)), frac=((cb%1)+1)%1, sc=Math.round(122+44*(1-frac));
+      g.fillStyle="rgba(22,21,15,"+(0.55+0.4*(1-frac))+")"; g.font="800 "+sc+"px 'Bricolage Grotesque',sans-serif"; g.textAlign="center"; g.fillText(num,W/2,H/2+45); g.textAlign="left"; }
+  }
+  // pitch trail (ink)
+  const n2=trail.length,dx=W/n2; g.lineWidth=3.5; g.strokeStyle="#16150f"; g.lineJoin="round"; g.beginPath(); let st=false;
+  for(let i=0;i<n2;i++){ const m=trail[i]; if(m===null){st=false;continue;} const x=i*dx,y=midiToY(m,H); if(!st){g.moveTo(x,y);st=true;} else g.lineTo(x,y); }
+  g.stroke();
+  if(liveMidi!==null){ const y=midiToY(liveMidi,H); g.fillStyle="#16150f"; g.beginPath(); g.arc(NOW_X,y,7,0,7); g.fill(); g.strokeStyle="#fffefb"; g.lineWidth=2; g.stroke(); }
+  // sparks
+  for(let i=sparks.length-1;i>=0;i--){ const s=sparks[i]; s.x+=s.vx; s.y+=s.vy; s.vy+=0.18; s.life--; s.rot+=s.rs; g.save(); g.translate(s.x,s.y); g.rotate(s.rot); g.globalAlpha=Math.max(0,s.life/30); g.fillStyle="#16150f"; if(s.blob){ g.beginPath(); g.arc(0,0,s.sz,0,7); g.fill(); } else { star(0,0,s.sz); g.fill(); } g.restore(); g.globalAlpha=1; if(s.life<=0) sparks.splice(i,1); }
+  // popups
+  for(let i=popups.length-1;i>=0;i--){ const p=popups[i]; p.y-=p.top?0.3:1.2; p.life--; g.globalAlpha=Math.max(0,p.life/46); g.fillStyle="#16150f";
+    g.font=(p.huge?"800 72px":p.big?"800 30px":"700 20px")+" 'Bricolage Grotesque',sans-serif"; g.textAlign="center"; g.fillText(p.text,p.top?(cvs.width/2):(p.huge?p.x:p.x+14),p.y); g.textAlign="left"; g.globalAlpha=1; if(p.life<=0) popups.splice(i,1); }
+  g.restore();
+}
+
+/* ===================== mode / key / misc ===================== */
+document.querySelectorAll(".modebtn").forEach(b=>b.onclick=()=>{ document.querySelectorAll(".modebtn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); mode=b.dataset.mode; applyMode(); });
+$("keySel").onchange=e=>{ keyName=e.target.value; gameActive=false; notes=[]; endScreen.classList.remove("show"); goBtn.textContent="▶ START"; goBtn.classList.remove("stop"); draw(); };
+function setBpm(v){ bpm=Math.max(40,Math.min(120,v)); $("bpmVal").textContent=bpm; }
+$("bpmDown").onclick=()=>setBpm(bpm-5); $("bpmUp").onclick=()=>setBpm(bpm+5);
+$("rangeReset").onclick=()=>{ rangeLo=rangeHi=null; $("rangeLo").textContent="—"; $("rangeHi").textContent="—"; };
+$("backChk").onchange=e=>{ backingOn=e.target.checked; };
+
+/* ===================== 鍵盤捷徑(空白=開始/停止、1-4 切模式、聽辨作答、講解翻頁) ===================== */
+window.addEventListener("keydown",e=>{
+  const t=e.target; if(t && (t.tagName==="SELECT"||t.tagName==="INPUT"||t.tagName==="TEXTAREA")) return;
+  if($("bardScreen").classList.contains("show") || lessonDeck.classList.contains("show")) return;
+  const k=e.key;
+  if(k==="Escape" && mode!=="game"){ e.preventDefault(); document.querySelector('.modebtn[data-mode="game"]').click(); return; }
+  if(k>="1"&&k<="4" && mode!=="ear"){ const b=document.querySelectorAll(".modebtn")[+k-1]; if(b){ e.preventDefault(); b.click(); } return; }
+  if(mode==="game"){
+    if(k===" "){ e.preventDefault(); if(endScreen.classList.contains("show")) startRun(); else goBtn.click(); }
+  } else if(mode==="ear"){
+    if(k==="r"||k==="R"){ e.preventDefault(); if(earChord) playEarChord(); }
+    else if(k===" "||k==="Enter"){ e.preventDefault(); if(earAnswered||!earChord) earNew(); }
+    else if(k>="1"&&k<="5"){ const c=document.querySelectorAll(".ear-choice")[+k-1]; if(c&&!c.disabled){ e.preventDefault(); c.click(); } }
+  } else if(mode==="theory"){
+    if(k==="ArrowRight"||k==="Enter"){ e.preventDefault(); $("thNext").click(); }
+    else if(k==="ArrowLeft"){ e.preventDefault(); if(thIdx>0){ thIdx--; renderTheory(); } }
+  }
+});
+micAttn();
+draw();
+</script>
+</body>
+</html>
