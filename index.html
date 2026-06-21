@@ -39,8 +39,12 @@
   select { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 11px; padding: 9px 13px; font-size: 13px; font-family: var(--mono); cursor: pointer; }
 
   .modebar { display: flex; gap: 9px; }
-  .modebtn { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 999px; padding: 8px 20px; font-size: 13px; font-family: var(--mono); font-weight: 700; cursor: pointer; transition: .14s; }
+  .modebtn { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 999px; padding: 8px 18px; font-size: 13px; font-family: var(--mono); font-weight: 700; cursor: pointer; transition: .14s; display: inline-flex; align-items: center; gap: 7px; }
   .modebtn.active { background: var(--ink); color: var(--paper); }
+  .ic { width: 1.06em; height: 1.06em; display: inline-block; vertical-align: -0.16em; flex: none; }
+  .bc-ic .ic { width: 17px; height: 17px; }
+  .tplay { display: inline-flex; align-items: center; gap: 6px; }
+  .ear-replay { display: inline-flex; align-items: center; gap: 6px; }
 
   .card { background: #fffefb; border: 2px solid var(--ink); border-radius: 18px; box-shadow: 6px 7px 0 -2px rgba(22,21,15,0.12), 11px 13px 0 -4px rgba(22,21,15,0.07); }
   .readout { display: grid; grid-template-columns: 168px 1fr; gap: 18px; align-items: center; padding: 16px 20px; }
@@ -301,7 +305,7 @@
 <div class="wrap">
   <header>
     <div>
-      <div class="kicker">Designer Soul · Developer Brain</div>
+      <div class="kicker">練唱 · 聽辨 · 樂理</div>
       <h1>音準鏡 / PITCH BARD</h1>
       <div class="sub" id="tagline">一串音往你這邊跑來，唱準它。 <span class="cur">_</span></div>
     </div>
@@ -314,18 +318,18 @@
   </header>
 
   <div class="modebar">
-    <button class="modebtn active" data-mode="game">🎵 跟著唱</button>
-    <button class="modebtn" data-mode="free">🪞 自由鏡</button>
-    <button class="modebtn" data-mode="ear">🎧 聽辨</button>
-    <button class="modebtn" data-mode="theory">📖 講解</button>
+    <button class="modebtn active" data-mode="game"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17V4l10-2v13"/><circle cx="6.5" cy="17" r="2.6"/><circle cx="16" cy="15" r="2.6"/></svg>跟著唱</button>
+    <button class="modebtn" data-mode="free"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="9" rx="6.5" ry="7"/><path d="M12 16v5M8.5 21h7"/></svg>自由鏡</button>
+    <button class="modebtn" data-mode="ear"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13v-1a7 7 0 0 1 14 0v1"/><rect x="3.5" y="13" width="3.8" height="6.6" rx="1.6"/><rect x="16.7" y="13" width="3.8" height="6.6" rx="1.6"/></svg>聽辨</button>
+    <button class="modebtn" data-mode="theory"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5v13"/><path d="M12 6.5C10.5 5 8 4.5 4 5v12.5c4-.5 6.5 0 8 1.5 1.5-1.5 4-2 8-1.5V5c-4-.5-6.5 0-8 1.5z"/></svg>講解</button>
   </div>
 
   <button class="bardchip" id="bardChip" title="打開 Bard 檔案">
-    <span class="bc-ic">🎭</span>
+    <span class="bc-ic" id="bcIc"></span>
     <span class="bc-lv" id="bcLv">Lv.1</span>
     <span class="bc-title" id="bcTitle">哼唱者</span>
     <span class="bc-xpbar"><i id="bcXpFill"></i></span>
-    <span class="bc-streak" id="bcStreak">🔥0</span>
+    <span class="bc-streak" id="bcStreak"></span>
     <span class="bc-go">PROFILE ›</span>
   </button>
 
@@ -346,7 +350,7 @@
       <div class="endmsg" id="egMsg">—</div>
       <div class="endbtns">
         <button class="again" id="egAgain">▶ AGAIN (↵)</button>
-        <button class="other" id="egOther">🔀 換音型</button>
+        <button class="other" id="egOther">換一個音型</button>
       </div>
     </div>
     <div class="lessondeck" id="lessonDeck">
@@ -373,13 +377,13 @@
     <div class="grp">音型 <select id="patSel"></select></div>
     <div class="grp bpm">BPM <button id="bpmDown">−</button><b id="bpmVal">70</b><button id="bpmUp">+</button></div>
     <label class="toggle"><input type="checkbox" id="cueChk" checked /> 提示音</label>
-    <label class="toggle"><input type="checkbox" id="backChk" checked /> 🎸 伴奏</label>
+    <label class="toggle"><input type="checkbox" id="backChk" checked /> 伴奏</label>
     <label class="toggle"><input type="checkbox" id="autoChk" /> 自動連續</label>
     <button class="go-btn" id="goBtn">▶ START</button>
   </div>
 
   <div class="controls">
-    <button class="mic-btn" id="micBtn">🎤 開麥克風</button>
+    <button class="mic-btn" id="micBtn">開麥克風</button>
     <div class="range-box">音域 <b id="rangeLo">—</b> ~ <b id="rangeHi">—</b> <button id="rangeReset">RESET</button></div>
   </div>
   <div class="status" id="status"></div>
@@ -393,11 +397,11 @@
         <option value="sigh">嘆氣偵測（借用 iv・你的簽名）</option>
         <option value="prog">和弦進行（整段聽）</option>
       </select></div>
-      <div class="earstats">🎧 連對 <b id="earStreak">0</b> · 總答對 <b id="earTotal">0</b></div>
+      <div class="earstats">連對 <b id="earStreak">0</b> · 總答對 <b id="earTotal">0</b></div>
     </div>
     <div class="earstage">
       <div class="earprompt" id="earPrompt">按 ▶ 出題，聽完選答案。先聽、再認 — 聲音優先。</div>
-      <button class="ear-replay" id="earReplay" style="display:none">🔊 重聽</button>
+      <button class="ear-replay" id="earReplay" style="display:none"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L13 19V5L7.5 9.5H4z"/><path d="M16 9.2a4 4 0 0 1 0 5.6"/></svg>重聽</button>
     </div>
     <div class="earchoices" id="earChoices"></div>
     <div class="earfeedback" id="earFeedback"></div>
@@ -410,10 +414,10 @@
   <div class="card theorypanel" id="theoryPanel" style="display:none">
     <div class="thead">
       <span class="tnav" id="thPage">1 / 17</span>
-      <span class="theadlbl">📖 你的聲音是怎麼搭起來的</span>
+      <span class="theadlbl">你的聲音是怎麼搭起來的</span>
       <div class="theadright">
         <select id="thJump" title="跳到某一招"></select>
-        <button id="thRand" class="thrand" title="隨機抽一張">🎲</button>
+        <button id="thRand" class="thrand" title="隨機抽一張"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="8.8" cy="8.8" r="1.1" fill="currentColor" stroke="none"/><circle cx="15.2" cy="15.2" r="1.1" fill="currentColor" stroke="none"/><circle cx="15.2" cy="8.8" r="1.1" fill="currentColor" stroke="none"/><circle cx="8.8" cy="15.2" r="1.1" fill="currentColor" stroke="none"/></svg></button>
       </div>
     </div>
     <div class="tcard">
@@ -432,9 +436,9 @@
   <div class="card tips">
     <b>玩法</b>：開麥克風 → 選音型 → ▶ START →（3-2-1 後）音符捲到<b>中線</b>時唱準它。<br>
     判定 <b>PERFECT / GREAT / GOOD / MISS</b>，連擊累積 <b>倍率 ×1→×8</b>，刷高分。結束按 <b>↵</b> 再來。<br>
-    <b>🎸 伴奏</b>開著時，底下會鋪和弦 pad + 極輕拍點（seasons / My Love 走真實進行，其他音型鋪該和弦的床）——把練音型變成「唱一首歌」。<br>
-    <b>⌨️ 快捷鍵</b>：<kbd>空白</kbd> 開始/停止 · <kbd>1</kbd>–<kbd>4</kbd> 切模式 · 聽辨 <kbd>1</kbd>–<kbd>7</kbd> 作答、<kbd>R</kbd> 重聽、<kbd>↵</kbd> 下一題 · 講解 <kbd>←</kbd><kbd>→</kbd> 翻頁<br>
-    <b>🎧 建議戴耳機</b>：用喇叭外放時，麥克風會收到提示音而誤判命中（已開回音消除，但耳機最保險）。<br>
+    <b>伴奏</b>開著時，底下會鋪和弦 pad + 極輕拍點（seasons / My Love 走真實進行，其他音型鋪該和弦的床）——把練音型變成「唱一首歌」。<br>
+    <b>快捷鍵</b>：<kbd>空白</kbd> 開始/停止 · <kbd>1</kbd>–<kbd>4</kbd> 切模式 · 聽辨 <kbd>1</kbd>–<kbd>7</kbd> 作答、<kbd>R</kbd> 重聽、<kbd>↵</kbd> 下一題 · 講解 <kbd>←</kbd><kbd>→</kbd> 翻頁<br>
+    <b>建議戴耳機</b>：用喇叭外放時，麥克風會收到提示音而誤判命中（已開回音消除，但耳機最保險）。<br>
     麥克風打不開？ Chrome 偶爾擋 <code>file://</code>，跟我說我用 localhost 開。
   </div>
 </div>
@@ -449,7 +453,7 @@
     <div class="bs-xprange"><span id="bsXpLo">0 exp</span><span id="bsXpHi">1500 exp</span></div>
     <button class="bs-levelup" id="bsLevelUp">INCREASE LEVEL</button>
     <div class="bs-stats">
-      <div><b id="bsStreak">0</b><span>連續天數 🔥</span></div>
+      <div><b id="bsStreak">0</b><span>連續天數</span></div>
       <div><b id="bsStars">0</b><span>總星數 ⭐</span></div>
       <div><b id="bsKnow">0/12</b><span>音型掌握</span></div>
     </div>
@@ -507,55 +511,55 @@ const PATTERNS={
 /* ===================== lesson cards (Slice 2) — 每關的樂理卡 + 設計卡 ===================== */
 const LESSONS={
   scale:[
-    {tag:"🎵 THEORY",t:"大調音階 = 一把尺",b:"Do Re Mi Fa Sol La Ti Do。七個音 + 回家。所有和弦、旋律都從這把尺量出來。先把尺唱準，後面都好辦。"},
-    {tag:"🎨 DESIGN",t:"留白 White Space",b:"參考圖為什麼好看？因為敢留空。空白不是浪費，是讓重點呼吸——就像旋律裡的休止符讓聲音有重量。"}],
+    {tag:"THEORY",t:"大調音階 = 一把尺",b:"Do Re Mi Fa Sol La Ti Do。七個音 + 回家。所有和弦、旋律都從這把尺量出來。先把尺唱準，後面都好辦。"},
+    {tag:"DESIGN",t:"留白 White Space",b:"參考圖為什麼好看？因為敢留空。空白不是浪費，是讓重點呼吸——就像旋律裡的休止符讓聲音有重量。"}],
   majtri:[
-    {tag:"🎵 THEORY",t:"大三和弦 = 1·3·5",b:"從尺上挑第 1、3、5 個音疊起來。明亮、穩定、像「家」。所有和聲的地基。唱琶音 = 把和弦拆開一個一個唱。"},
-    {tag:"🎨 DESIGN",t:"對比 Contrast",b:"純黑配紙白 = 最大對比 = 最清楚。設計跟唱歌一樣：有強弱對比才有戲，全部一樣大聲 = 沒重點。"}],
+    {tag:"THEORY",t:"大三和弦 = 1·3·5",b:"從尺上挑第 1、3、5 個音疊起來。明亮、穩定、像「家」。所有和聲的地基。唱琶音 = 把和弦拆開一個一個唱。"},
+    {tag:"DESIGN",t:"對比 Contrast",b:"純黑配紙白 = 最大對比 = 最清楚。設計跟唱歌一樣：有強弱對比才有戲，全部一樣大聲 = 沒重點。"}],
   mintri:[
-    {tag:"🎵 THEORY",t:"小三和弦 = 1·♭3·5",b:"只把大三的第 3 音降半音(♭3)，情緒整個翻成憂鬱。一個音的差別 = 大調與小調。耳朵記住這半音。"},
-    {tag:"🎨 DESIGN",t:"一個變數 One Variable",b:"大三→小三只動一個音。好設計也是：改一個變數(顏色/粗細/間距)就換氣氛，不用全部重來。"}],
+    {tag:"THEORY",t:"小三和弦 = 1·♭3·5",b:"只把大三的第 3 音降半音(♭3)，情緒整個翻成憂鬱。一個音的差別 = 大調與小調。耳朵記住這半音。"},
+    {tag:"DESIGN",t:"一個變數 One Variable",b:"大三→小三只動一個音。好設計也是：改一個變數(顏色/粗細/間距)就換氣氛，不用全部重來。"}],
   maj7:[
-    {tag:"🎵 THEORY",t:"Maj7 = 1·3·5·7",b:"大三和弦 + 第 7 音。那個 7 度讓它「漂浮、夢幻」——seasons、Laufey 整片的甜味。你耳朵早就愛它了。"},
-    {tag:"🎵 THEORY",t:"為什麼夢幻",b:"7 度音離根音只差半音，製造一種「沒完全落地」的懸浮感。不解決的張力 = 美。"},
-    {tag:"🎨 DESIGN",t:"字體配對",b:"Designer Soul × Developer Brain：Bricolage(塗鴉感)配 Space Mono(精準等寬)。一感性一理性 = 張力。配字像配和弦。"}],
+    {tag:"THEORY",t:"Maj7 = 1·3·5·7",b:"大三和弦 + 第 7 音。那個 7 度讓它「漂浮、夢幻」——seasons、Laufey 整片的甜味。你耳朵早就愛它了。"},
+    {tag:"THEORY",t:"為什麼夢幻",b:"7 度音離根音只差半音，製造一種「沒完全落地」的懸浮感。不解決的張力 = 美。"},
+    {tag:"DESIGN",t:"字體配對",b:"Designer Soul × Developer Brain：Bricolage(塗鴉感)配 Space Mono(精準等寬)。一感性一理性 = 張力。配字像配和弦。"}],
   dom7:[
-    {tag:"🎵 THEORY",t:"屬七 = 1·3·5·♭7",b:"跟 Maj7 只差一個音：7 度降半音變 ♭7。它產生「往前拉」的力，硬要解決到下一個和弦。流行/爵士一半的動力。"},
-    {tag:"🎨 DESIGN",t:"張力與解決",b:"屬七想往前，就像畫面裡一個沒對齊的元素會讓你想修正。設計師故意製造張力再解決，引導視線。"}],
+    {tag:"THEORY",t:"屬七 = 1·3·5·♭7",b:"跟 Maj7 只差一個音：7 度降半音變 ♭7。它產生「往前拉」的力，硬要解決到下一個和弦。流行/爵士一半的動力。"},
+    {tag:"DESIGN",t:"張力與解決",b:"屬七想往前，就像畫面裡一個沒對齊的元素會讓你想修正。設計師故意製造張力再解決，引導視線。"}],
   min7:[
-    {tag:"🎵 THEORY",t:"Min7 = 1·♭3·5·♭7",b:"小三和弦 + ♭7。比小三更柔、更爵士、更慵懶。Neo-soul、bedroom R&B 的招牌色。"},
-    {tag:"🎨 DESIGN",t:"質感 Texture",b:"畫面那層紙紋顆粒 = min7 的慵懶。乾淨太冷，加一點噪點就有溫度。聲音跟畫面都需要「質感」。"}],
+    {tag:"THEORY",t:"Min7 = 1·♭3·5·♭7",b:"小三和弦 + ♭7。比小三更柔、更爵士、更慵懶。Neo-soul、bedroom R&B 的招牌色。"},
+    {tag:"DESIGN",t:"質感 Texture",b:"畫面那層紙紋顆粒 = min7 的慵懶。乾淨太冷，加一點噪點就有溫度。聲音跟畫面都需要「質感」。"}],
   seasons:[
-    {tag:"🎵 THEORY",t:"seasons 四和弦",b:"Dmaj7 → D7 → Gmaj7 → Gm6 = Imaj7 → I7 → IVmaj7 → iv6。你要一個一個唱出它們的和弦音。"},
-    {tag:"🎵 THEORY",t:"半音下行的嘆氣",b:"Dmaj7→D7 的 C♯→C、Gmaj7→Gm6 的 B→B♭。兩聲往下的半音 = 那種「融化」。借來的小調 iv 最催淚。"},
-    {tag:"🎨 DESIGN",t:"主題一致性",b:"設計有「主題」，每個選擇都從它長出來——像一首歌所有和弦都在一個調裡。一致 = 有靈魂。"}],
+    {tag:"THEORY",t:"seasons 四和弦",b:"Dmaj7 → D7 → Gmaj7 → Gm6 = Imaj7 → I7 → IVmaj7 → iv6。你要一個一個唱出它們的和弦音。"},
+    {tag:"THEORY",t:"半音下行的嘆氣",b:"Dmaj7→D7 的 C♯→C、Gmaj7→Gm6 的 B→B♭。兩聲往下的半音 = 那種「融化」。借來的小調 iv 最催淚。"},
+    {tag:"DESIGN",t:"主題一致性",b:"設計有「主題」，每個選擇都從它長出來——像一首歌所有和弦都在一個調裡。一致 = 有靈魂。"}],
   mylove:[
-    {tag:"🎵 THEORY",t:"My Love 的招數",b:"Amaj7 → C♯ → D → Dm = Imaj7 → III → IV → iv。C♯ 是意外的一道亮(借來的 III,就是 Radiohead〈Creep〉那招);D→Dm 再收回 seasons 的借用小調 iv,只動一根手指。"},
-    {tag:"🎨 DESIGN",t:"重複與變奏",b:"My Love 用跟 seasons 同一招、換個調。設計系統也是：同一個元件重複用，微調就成系列。"}],
+    {tag:"THEORY",t:"My Love 的招數",b:"Amaj7 → C♯ → D → Dm = Imaj7 → III → IV → iv。C♯ 是意外的一道亮(借來的 III,就是 Radiohead〈Creep〉那招);D→Dm 再收回 seasons 的借用小調 iv,只動一根手指。"},
+    {tag:"DESIGN",t:"重複與變奏",b:"My Love 用跟 seasons 同一招、換個調。設計系統也是：同一個元件重複用，微調就成系列。"}],
   dreamer:[
-    {tag:"🎵 THEORY",t:"Dreamer = seasons 的姊妹",b:"Dmaj7 → Gmaj7 → Gm6 → A7 = Imaj7 → IVmaj7 → iv6 → V7。那個 Gmaj7→Gm6(B→B♭) 就是你在 seasons 唱過的「嘆氣」——同一招、同一個 D 調，換 Laufey 唱。你耳朵早就會了。"},
-    {tag:"🎵 THEORY",t:"借用 iv = 你的口味簽名",b:"深挖你 155 首收藏：這個「大調→小調 iv」的融化感，出現在 seasons、My Love、Dreamer、Bruno Major〈Home〉… 是你最常被電到的一招。記住這個聲音。"},
-    {tag:"🎨 DESIGN",t:"變奏 Variation",b:"Laufey 拿流行的 maj7 + 借用 iv，加爵士句法，就成了她。設計也是：同一個底，換個語氣 = 個人風格。"}],
+    {tag:"THEORY",t:"Dreamer = seasons 的姊妹",b:"Dmaj7 → Gmaj7 → Gm6 → A7 = Imaj7 → IVmaj7 → iv6 → V7。那個 Gmaj7→Gm6(B→B♭) 就是你在 seasons 唱過的「嘆氣」——同一招、同一個 D 調，換 Laufey 唱。你耳朵早就會了。"},
+    {tag:"THEORY",t:"借用 iv = 你的口味簽名",b:"深挖你 155 首收藏：這個「大調→小調 iv」的融化感，出現在 seasons、My Love、Dreamer、Bruno Major〈Home〉… 是你最常被電到的一招。記住這個聲音。"},
+    {tag:"DESIGN",t:"變奏 Variation",b:"Laufey 拿流行的 maj7 + 借用 iv，加爵士句法，就成了她。設計也是：同一個底，換個語氣 = 個人風格。"}],
   homebody:[
-    {tag:"🎵 THEORY",t:"homebody = 兩個 maj7",b:"Emaj7 → Amaj7 = Imaj7 → IVmaj7。整首靠兩個和弦。maj7 的第 7 音讓它「漂浮、慵懶、在家」。最少的和弦，最對的味道。"},
-    {tag:"🎵 THEORY",t:"為什麼兩個就夠",b:"Imaj7 ↔ IVmaj7 來回，就是一整片 bedroom-pop。你怕「學不完」——這首證明：會兩個 maj7 就能唱一首歌。完成 > 完美。"},
-    {tag:"🎨 DESIGN",t:"極簡 Minimalism",b:"兩個和弦 = 設計的留白。少即是多。Kamal. 不靠複雜，靠氣氛——跟你的黑白塗鴉同一個信仰。"}],
+    {tag:"THEORY",t:"homebody = 兩個 maj7",b:"Emaj7 → Amaj7 = Imaj7 → IVmaj7。整首靠兩個和弦。maj7 的第 7 音讓它「漂浮、慵懶、在家」。最少的和弦，最對的味道。"},
+    {tag:"THEORY",t:"為什麼兩個就夠",b:"Imaj7 ↔ IVmaj7 來回，就是一整片 bedroom-pop。你怕「學不完」——這首證明：會兩個 maj7 就能唱一首歌。完成 > 完美。"},
+    {tag:"DESIGN",t:"極簡 Minimalism",b:"兩個和弦 = 設計的留白。少即是多。Kamal. 不靠複雜，靠氣氛——跟你的黑白塗鴉同一個信仰。"}],
   fang23:[
-    {tag:"🎵 THEORY",t:"才二十三 = seasons 的招，低一個全音",b:"Cmaj7 → C7 → Fmaj7 → Fm6 = Imaj7 → I7 → IVmaj7 → iv6。發現了嗎？這就是 seasons 的進行，整個低一個全音。你 #1 最常重播的歌，跟你的錨歌同一招——借用 iv ＋ maj7→屬七的半音下行。"},
-    {tag:"🎵 THEORY",t:"R&B 的延伸甜味",b:"原曲在 E♭，用 maj9 / m6 / m11 這些延伸和弦——就是你 maj7 甜味的進階版。方大同(你 Rewind #1 熱播藝人)2024 遺作，得金曲最佳作曲人獎。"},
-    {tag:"🎨 DESIGN",t:"限制 = 風格",b:"整首十個和弦，卻只用一種右手指法。限制不是少，是讓一個元素被聽見——跟你的黑白塗鴉同一個信仰。"}],
+    {tag:"THEORY",t:"才二十三 = seasons 的招，低一個全音",b:"Cmaj7 → C7 → Fmaj7 → Fm6 = Imaj7 → I7 → IVmaj7 → iv6。發現了嗎？這就是 seasons 的進行，整個低一個全音。你 #1 最常重播的歌，跟你的錨歌同一招——借用 iv ＋ maj7→屬七的半音下行。"},
+    {tag:"THEORY",t:"R&B 的延伸甜味",b:"原曲在 E♭，用 maj9 / m6 / m11 這些延伸和弦——就是你 maj7 甜味的進階版。方大同(你 Rewind #1 熱播藝人)2024 遺作，得金曲最佳作曲人獎。"},
+    {tag:"DESIGN",t:"限制 = 風格",b:"整首十個和弦，卻只用一種右手指法。限制不是少，是讓一個元素被聽見——跟你的黑白塗鴉同一個信仰。"}],
   thirds:[
-    {tag:"🎵 THEORY",t:"三度 = 和聲的磚塊",b:"和弦是「疊三度」堆出來的(1→3→5→7)。在音階上練跳三度，耳朵就開始聽得到「和聲」而不只是旋律。"},
-    {tag:"🎨 DESIGN",t:"節奏感 Rhythm",b:"版面也有節奏：大小、間距的交替 = 視覺的拍子。旋律的起伏跟元素的疏密，是同一種律動。"}],
+    {tag:"THEORY",t:"三度 = 和聲的磚塊",b:"和弦是「疊三度」堆出來的(1→3→5→7)。在音階上練跳三度，耳朵就開始聽得到「和聲」而不只是旋律。"},
+    {tag:"DESIGN",t:"節奏感 Rhythm",b:"版面也有節奏：大小、間距的交替 = 視覺的拍子。旋律的起伏跟元素的疏密，是同一種律動。"}],
   leapsfifth:[
-    {tag:"🎵 THEORY",t:"五度 = 最穩的跳",b:"五度(1→5)是除了八度外最和諧的音程，調性的骨架。唱大跳考驗音準——先在腦中聽到目標音再唱(audiation)。"},
-    {tag:"🎨 DESIGN",t:"層級 Hierarchy",b:"大跳 = 畫面裡的大標題。大小落差製造層級，眼睛先看大的。沒層級 = 沒有起伏的歌，平。"}],
+    {tag:"THEORY",t:"五度 = 最穩的跳",b:"五度(1→5)是除了八度外最和諧的音程，調性的骨架。唱大跳考驗音準——先在腦中聽到目標音再唱(audiation)。"},
+    {tag:"DESIGN",t:"層級 Hierarchy",b:"大跳 = 畫面裡的大標題。大小落差製造層級，眼睛先看大的。沒層級 = 沒有起伏的歌，平。"}],
   semi:[
-    {tag:"🎵 THEORY",t:"半音 = 最小的距離",b:"相鄰兩格的距離。往下的半音 = 「嘆氣」，seasons 那招的核心。最小的移動，最大的情緒。"},
-    {tag:"🎨 DESIGN",t:"微調的力量",b:"半音是音樂最小的一步，卻最有感。設計也是：1px 間距、5% 的灰、一點圓角——專業差在微調。"}],
+    {tag:"THEORY",t:"半音 = 最小的距離",b:"相鄰兩格的距離。往下的半音 = 「嘆氣」，seasons 那招的核心。最小的移動，最大的情緒。"},
+    {tag:"DESIGN",t:"微調的力量",b:"半音是音樂最小的一步，卻最有感。設計也是：1px 間距、5% 的灰、一點圓角——專業差在微調。"}],
   random:[
-    {tag:"🎵 THEORY",t:"音程聽辨",b:"隨機跳音 = 訓練耳朵抓任意兩音的距離。這是「相對音感」的核心：聽到就知道差幾度。最難也最有用。"},
-    {tag:"🎨 DESIGN",t:"刻意練習",b:"隨機 = 不能靠肌肉記憶，逼你真的聽。臨摹參考圖也別只複製，問「為什麼這樣排」，才會內化。"}]
+    {tag:"THEORY",t:"音程聽辨",b:"隨機跳音 = 訓練耳朵抓任意兩音的距離。這是「相對音感」的核心：聽到就知道差幾度。最難也最有用。"},
+    {tag:"DESIGN",t:"刻意練習",b:"隨機 = 不能靠肌肉記憶，逼你真的聽。臨摹參考圖也別只複製，問「為什麼這樣排」，才會內化。"}]
 };
 
 /* ===================== state ===================== */
@@ -571,6 +575,13 @@ const popups=[], sparks=[]; let beatPulse=0, lastBeatInt=-1, shakeT=0;
 let masterDry=null, reverbSend=null, reverbWet=null;
 
 const $=id=>document.getElementById(id);
+/* 手繪線稿圖示(取代 emoji,跟黑白塗鴉同一支筆) */
+const IC={
+ spk:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L13 19V5L7.5 9.5H4z"/><path d="M16 9.2a4 4 0 0 1 0 5.6"/></svg>',
+ dice:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="8.8" cy="8.8" r="1.1" fill="currentColor" stroke="none"/><circle cx="15.2" cy="15.2" r="1.1" fill="currentColor" stroke="none"/><circle cx="15.2" cy="8.8" r="1.1" fill="currentColor" stroke="none"/><circle cx="8.8" cy="15.2" r="1.1" fill="currentColor" stroke="none"/></svg>',
+ flame:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c.5 3.5 4.5 4.5 4.5 8.5a4.5 4.5 0 0 1-9 0c0-1.8.8-2.8 1.8-3.8.6 1.6 1.7 1.2 2.2-.2.4-1.1.3-2.6-.5-4.5z"/></svg>',
+ face:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="10.5" r="0.9" fill="currentColor" stroke="none"/><circle cx="15" cy="10.5" r="0.9" fill="currentColor" stroke="none"/><path d="M9 14.6c1.2 1.4 4.8 1.4 6 0"/></svg>'
+};
 const cvs=$("trail"), g=cvs.getContext("2d");
 const noteBig=$("noteBig"), hzEl=$("hz"), centsMarker=$("centsMarker"), verdict=$("verdict");
 const statusEl=$("status"), micBtn=$("micBtn"), goBtn=$("goBtn"), endScreen=$("endScreen");
@@ -593,11 +604,13 @@ function unlockAudio(){
 document.addEventListener("visibilitychange", ()=>{ if(!document.hidden && audioCtx && audioCtx.state==="suspended") audioCtx.resume(); });
 function makeIR(sec,decay){ const rate=audioCtx.sampleRate, len=Math.floor(rate*sec), buf=audioCtx.createBuffer(2,len,rate); for(let ch=0;ch<2;ch++){ const d=buf.getChannelData(ch); for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay); } return buf; }
 function setupBus(){
-  masterDry=audioCtx.createGain(); masterDry.gain.value=0.9; masterDry.connect(audioCtx.destination);
-  const conv=audioCtx.createConvolver(); conv.buffer=makeIR(2.2,2.6);
-  reverbWet=audioCtx.createGain(); reverbWet.gain.value=0.16;
+  // 主輸出加一層溫和低通,把合成的尖刺磨掉,往「凌晨耳機 / lo-fi」的暖聲走
+  const lp=audioCtx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=7200; lp.Q.value=0.4; lp.connect(audioCtx.destination);
+  masterDry=audioCtx.createGain(); masterDry.gain.value=0.9; masterDry.connect(lp);
+  const conv=audioCtx.createConvolver(); conv.buffer=makeIR(2.4,2.6);
+  reverbWet=audioCtx.createGain(); reverbWet.gain.value=0.19;
   reverbSend=audioCtx.createGain(); reverbSend.gain.value=1;
-  reverbSend.connect(conv); conv.connect(reverbWet); reverbWet.connect(audioCtx.destination);
+  reverbSend.connect(conv); conv.connect(reverbWet); reverbWet.connect(lp);
 }
 function softTone(freq, dur, peak){
   ensureCtx(); const t=audioCtx.currentTime; peak=peak||0.3;
@@ -807,88 +820,88 @@ const THEORY=[
  { sym:"1 · 3 · 5", t:"和弦 = 從音階疊出來的",
    body:"大調音階七個音(Do Re Mi Fa Sol La Ti)。和弦不是亂按——是「跳著挑」:第 1、3、5 個音疊起來 = 大三和弦。所有和聲的地基。",
    song:"你每首歌底下都是這個。",
-   plays:[ {label:"🔊 先聽 D 大調音階", spell:"D E F♯ G A B C♯ D", notes:[50,52,54,55,57,59,61,62], mode:"melody"},
-           {label:"🔊 挑 1·3·5 = D 大三", spell:"D F♯ A", notes:[50,54,57], mode:"chord"} ] },
+   plays:[ {label:"先聽 D 大調音階", spell:"D E F♯ G A B C♯ D", notes:[50,52,54,55,57,59,61,62], mode:"melody"},
+           {label:"挑 1·3·5 = D 大三", spell:"D F♯ A", notes:[50,54,57], mode:"chord"} ] },
  { sym:"I ii iii IV V vi", t:"家人和弦:一個調有哪些「自己人」",
    body:"把一個調的音階,每個音都往上疊 1·3·5,就得到這個調的「家人」和弦。D 大調的家人:I=D、ii=Em、iii=F♯m、IV=G、V=A、vi=Bm。好記規律:大寫 I IV V = 大三,小寫 ii iii vi = 小三。這幾個就是 D 大調「不會錯」的和弦。",
    song:"你愛的歌九成都在這個家裡轉——seasons、My Love、Dreamer 的骨架都是這幾個。",
-   plays:[ {label:"🔊 I = D 大", spell:"D F♯ A", notes:[50,54,57], mode:"chord"},
-           {label:"🔊 IV = G 大", spell:"G B D", notes:[55,59,62], mode:"chord"},
-           {label:"🔊 V = A 大", spell:"A C♯ E", notes:[57,61,64], mode:"chord"},
-           {label:"🔊 vi = B 小", spell:"B D F♯", notes:[59,62,66], mode:"chord"} ] },
+   plays:[ {label:"I = D 大", spell:"D F♯ A", notes:[50,54,57], mode:"chord"},
+           {label:"IV = G 大", spell:"G B D", notes:[55,59,62], mode:"chord"},
+           {label:"V = A 大", spell:"A C♯ E", notes:[57,61,64], mode:"chord"},
+           {label:"vi = B 小", spell:"B D F♯", notes:[59,62,66], mode:"chord"} ] },
  { sym:"sus2 / sus4", t:"sus:把和弦的「心」拿掉,先吊著",
    body:"和弦裡決定「開心還是憂鬱」的是第 3 個音。把它拿掉、換成隔壁的 4 或 2,和弦就「沒表情、懸在半空」,像話講一半——你會本能想讓它「落回」原本的大三。這是吉他開放和弦最容易手滑彈到的甜點(一根手指的事),你 capo 刷歌時其實一直在用,只是沒名字。",
    song:"John Mayer〈Stop This Train〉開頭就是 Dsus2;D / A / E / G 開放和弦的世界到處都是。",
-   plays:[ {label:"🔊 Dsus2 → D(那顆 E 落回 F♯)", spell:"D E A → D F♯ A", chords:[[50,52,57],[50,54,57]]},
-           {label:"🔊 Dsus4 → D(那顆 G 落回 F♯)", spell:"D G A → D F♯ A", chords:[[50,55,57],[50,54,57]]} ] },
+   plays:[ {label:"Dsus2 → D(那顆 E 落回 F♯)", spell:"D E A → D F♯ A", chords:[[50,52,57],[50,54,57]]},
+           {label:"Dsus4 → D(那顆 G 落回 F♯)", spell:"D G A → D F♯ A", chords:[[50,55,57],[50,54,57]]} ] },
  { sym:"1 · 3 · 5 · 7", t:"加第七個音 = 你的甜味 (maj7)",
    body:"在大三(1·3·5)上再疊一個音(第 7 度)= maj7。差別只有「一個音」:多了 C♯。那個 7 度讓它「漂浮、不落地」。對一下底下組成音。",
    song:"seasons 開頭 Dmaj7、homebody 整首、Laufey 全部——你耳朵早就愛這個甜。",
-   plays:[ {label:"🔊 D 大三", spell:"D F♯ A", notes:[50,54,57], mode:"chord"},
-           {label:"🔊 → Dmaj7", spell:"D F♯ A C♯", notes:[50,54,57,61], mode:"chord"} ] },
+   plays:[ {label:"D 大三", spell:"D F♯ A", notes:[50,54,57], mode:"chord"},
+           {label:"→ Dmaj7", spell:"D F♯ A C♯", notes:[50,54,57,61], mode:"chord"} ] },
  { sym:"大調 ↔ 平行小調", t:"什麼是「借用」?借隔壁的客人",
    body:"借用 = 暫時用一個「不屬於你這個調」的和弦,從別的調借來,用完馬上回家。最常借的對象 = 平行小調(同一個根音、換成小調)。D 大 ↔ D 小,同一個家、不同心情。D 大調的 IV 是 G 大(家人);跟 D 小調借,就拿到 G 小(客人)——那個「外人音」就是 B♭。",
    song:"(注意:是「平行」小調 = 同根音 D 小,不是「關係」小調 B 小。)亮的調裡借一塊小調陰影、嘆口氣再回家——就是 seasons 在做的事。",
-   plays:[ {label:"🔊 IV = G 大(家人·亮)", spell:"G B D", notes:[55,59,62], mode:"chord"},
-           {label:"🔊 借來的 iv = G 小(客人·暗)", spell:"G B♭ D", notes:[55,58,62], mode:"chord"} ] },
+   plays:[ {label:"IV = G 大(家人·亮)", spell:"G B D", notes:[55,59,62], mode:"chord"},
+           {label:"借來的 iv = G 小(客人·暗)", spell:"G B♭ D", notes:[55,58,62], mode:"chord"} ] },
  { sym:"IV → iv", t:"你的第一簽名:借用小調 iv(嘆氣)",
    body:"這就是你最常被電到的那一聲嘆氣:借一個不屬於這個調的小調和弦,嘆口氣再回家。seasons 用「加味版」Gmaj7→Gm6,其實「兩個音」一起往下:B→B♭(第 3 音,大變小 = 主角)＋ F♯→E(maj7 的 7 變成 6)。對一下底下組成音。",
    song:"seasons 的 Gmaj7→Gm6、Dreamer 一樣、My Love 的 D→Dm、Bruno Major〈Home〉、方大同〈才二十三〉(你 #1 重播,同一招、不同調)。這是你最常被電到的一招。",
-   plays:[ {label:"🔊 Gmaj7(亮)", spell:"G B D F♯", notes:[55,59,62,66], mode:"chord"},
-           {label:"🔊 → Gm6(暗一下 = 嘆氣)", spell:"G B♭ D E", notes:[55,58,62,64], mode:"chord"} ] },
+   plays:[ {label:"Gmaj7(亮)", spell:"G B D F♯", notes:[55,59,62,66], mode:"chord"},
+           {label:"→ Gm6(暗一下 = 嘆氣)", spell:"G B♭ D E", notes:[55,58,62,64], mode:"chord"} ] },
  { sym:"1 · ♭3 · 5 · 6", t:"m6:暗,但不死",
    body:"純小三和弦 = 全暗。m6 多疊一個第 6 音——那顆 6 讓它「苦中帶甜、漂浮、沒完全沉下去」。所以 seasons 的嘆氣是「融化」不是「悲傷」:它借了小調的暗,又留了一點甜。你之前自己抓到的「Gm6 跟 Gmaj7 差兩個音」,那第二個音(E)就是這顆 6。",
    song:"seasons / Dreamer 的 Gm6、才二十三 的 Fm6——你的嘆氣全是 m6,不是純小調。",
-   plays:[ {label:"🔊 G 小(全暗)", spell:"G B♭ D", notes:[55,58,62], mode:"chord"},
-           {label:"🔊 → Gm6(暗+一點甜)", spell:"G B♭ D E", notes:[55,58,62,64], mode:"chord"} ] },
+   plays:[ {label:"G 小(全暗)", spell:"G B♭ D", notes:[55,58,62], mode:"chord"},
+           {label:"→ Gm6(暗+一點甜)", spell:"G B♭ D E", notes:[55,58,62,64], mode:"chord"} ] },
  { sym:"1 · 3 · 5 · ♭7", t:"屬七 = 想往前的力",
    body:"把 maj7 的第 7 音再降半音(C♯→C)= 屬7。一樣只動「一個音」,但它不甜了,變「癢、想解決、往前推」。流行/爵士一半的動力來自這個「想走」。",
    song:"seasons 第一→第二個和弦,就是 maj7→屬7(Dmaj7→D7)。這就是你聽辨分不太出來的那兩個——現在你有對照了。",
-   plays:[ {label:"🔊 Dmaj7(甜、停住)", spell:"D F♯ A C♯", notes:[50,54,57,61], mode:"chord"},
-           {label:"🔊 → D7(癢、想走)", spell:"D F♯ A C", notes:[50,54,57,60], mode:"chord"} ] },
+   plays:[ {label:"Dmaj7(甜、停住)", spell:"D F♯ A C♯", notes:[50,54,57,61], mode:"chord"},
+           {label:"→ D7(癢、想走)", spell:"D F♯ A C", notes:[50,54,57,60], mode:"chord"} ] },
  { sym:"I · Imaj7 · I7", t:"和弦裡的下行暗線(偷偷溜下半音)",
    body:"根音整段不動,但和弦裡藏了一條會走路的線:最上面那音一路半音往下溜(B→B♭→A)。耳朵聽到的不是換和弦,是一條慵懶下滑的暗線——電影開場、菸還沒點完那種鬆。而且它常常走到底,就接上你最愛的借用 iv。",
    song:"seasons 的 Dmaj7→D7 就是這條線的前兩步(C♯→C);Bruno Major〈Home〉、Matt Maltese〈Kiss Me〉、Laufey〈Letter To My 13〉、How Deep Is Your Love 走完整條。",
-   plays:[ {label:"🔊 C 大三(平,沒有線)", spell:"C E G", notes:[48,52,55], mode:"chord"},
-           {label:"🔊 C → Cmaj7 → C7 → F(聽最上面下樓梯)", spell:"上聲部 B → B♭ → A", chords:[[48,52,55],[48,52,55,59],[48,52,55,58],[53,57,60]]} ] },
+   plays:[ {label:"C 大三(平,沒有線)", spell:"C E G", notes:[48,52,55], mode:"chord"},
+           {label:"C → Cmaj7 → C7 → F(聽最上面下樓梯)", spell:"上聲部 B → B♭ → A", chords:[[48,52,55],[48,52,55,59],[48,52,55,58],[53,57,60]]} ] },
  { sym:"1 · 3 · ♯5", t:"增和弦:亮到不穩的橋(love. 那顆)",
    body:"把大三裡那顆「5 度」往上頂半音 = 增三和弦(aug),它「亮到不穩」,像踮腳尖,專門當兩個和弦之間的橋。love. 的 A→Aaug→Dmaj7,中間那顆把你頂上去(最上面 E→E♯→F♯ 往上爬)——跟上一張的下行暗線剛好是鏡子,一個往下、一個往上。",
    song:"wave to earth〈love.〉:A→Aaug→Dmaj7→Dm,頂上去之後就接你的借用 iv(Dm)。",
-   plays:[ {label:"🔊 A → Dmaj7(直接走,平)", spell:"A C♯ E → D F♯ A C♯", chords:[[57,61,64],[50,54,57,61]]},
-           {label:"🔊 A → Aaug → Dmaj7(有橋,聽中間頂上去)", spell:"A C♯ E → A C♯ E♯ → Dmaj7", chords:[[57,61,64],[57,61,65],[50,57,61,66]]} ] },
+   plays:[ {label:"A → Dmaj7(直接走,平)", spell:"A C♯ E → D F♯ A C♯", chords:[[57,61,64],[50,54,57,61]]},
+           {label:"A → Aaug → Dmaj7(有橋,聽中間頂上去)", spell:"A C♯ E → A C♯ E♯ → Dmaj7", chords:[[57,61,64],[57,61,65],[50,57,61,66]]} ] },
  { sym:"V7 / IV", t:"次屬:seasons 的 D7 有秘密身份",
    body:"D 大調裡,D7 本來不是家人(C 不在 D 大調)。它其實是「借來指路的箭頭」:D7 = G 的屬七(V7/IV),整個和弦在喊「我要去 G!」。所以 seasons 的 Dmaj7→D7→Gmaj7,那個 D7 是橋——先變癢,再解決到 G,你聽起來才那麼順。這招叫次屬和弦(secondary dominant)。",
    song:"seasons 的 D7→Gmaj7、Mr. Sandman 整首就是次屬接龍(每個和弦都指向下一個)。",
-   plays:[ {label:"🔊 Dmaj7 → Gmaj7(直接走,平)", spell:"沒有箭頭", chords:[[50,54,57,61],[55,59,62,66]]},
-           {label:"🔊 D7 → Gmaj7(先癢再解決,順!)", spell:"D7 = V7/IV,指著 G 的箭頭", chords:[[50,54,57,60],[55,59,62,66]]} ] },
+   plays:[ {label:"Dmaj7 → Gmaj7(直接走,平)", spell:"沒有箭頭", chords:[[50,54,57,61],[55,59,62,66]]},
+           {label:"D7 → Gmaj7(先癢再解決,順!)", spell:"D7 = V7/IV,指著 G 的箭頭", chords:[[50,54,57,60],[55,59,62,66]]} ] },
  { sym:"ii → V → I", t:"ii–V–I:爵士的回家路",
    body:"流行常直接 V→I 回家;爵士多走一步:ii→V→I,「準備→推→到家」。低音一路往下掉,像走下樓梯回到家,所以特別順。聽看看:走兩步再到家,是不是比直接到家更「圓」?",
    song:"Dreamer(Laufey)結尾 Em7→A7→Dmaj7 就是 ii–V–I——你已經唱過了;你 R&B 軸的 才二十三、Daniel Caesar 也常這樣回家。",
-   plays:[ {label:"🔊 V → I(直接回家)", spell:"A7 → Dmaj7", chords:[[57,61,64,67],[50,54,57,61]]},
-           {label:"🔊 ii → V → I(繞個彎更圓)", spell:"Em7 → A7 → Dmaj7", chords:[[52,55,59,62],[57,61,64,67],[50,54,57,61]]} ] },
+   plays:[ {label:"V → I(直接回家)", spell:"A7 → Dmaj7", chords:[[57,61,64,67],[50,54,57,61]]},
+           {label:"ii → V → I(繞個彎更圓)", spell:"Em7 → A7 → Dmaj7", chords:[[52,55,59,62],[57,61,64,67],[50,54,57,61]]} ] },
  { sym:"A → E/G♯ → F♯m7", t:"低音走樓梯:和弦的斜線是什麼",
    body:"「E/G♯」唸作「E over G♯」:上面彈 E 和弦,但最低音改彈 G♯。為什麼?為了讓低音走樓梯:A→G♯→F♯…一階一階下。和弦在換,低音卻在「走路」,歌就有了重力方向。這叫轉位(inversion)。看到斜線和弦別怕——它只是在指定低音。",
    song:"Daniel Caesar〈Always〉開頭就是 A→E/G♯→F♯m7→D,低音 A→G♯→F♯ 下樓梯。",
-   plays:[ {label:"🔊 Always 開頭(聽最低音下樓梯)", spell:"A → E/G♯ → F♯m7 → D", chords:[[45,57,61,64],[44,56,59,64],[42,54,57,64],[50,54,57,62]]} ] },
+   plays:[ {label:"Always 開頭(聽最低音下樓梯)", spell:"A → E/G♯ → F♯m7 → D", chords:[[45,57,61,64],[44,56,59,64],[42,54,57,64],[50,54,57,62]]} ] },
  { sym:"1·3·5·7 · 9", t:"maj9:甜上加甜(R&B 的天花板)",
    body:"maj7 再往上疊一個 9(= 高八度的第 2 音)= maj9。更厚、更霧、更「夢裡」。R&B/soul 的招牌色——和弦疊得越高,離地越遠。方大同〈才二十三〉原曲開頭就是 E♭maj9。你現在唱 maj7 就夠甜了;maj9 只是同一個甜再加一層霧——耳朵先愛上,吉他哪天想加再加。",
    song:"方大同〈才二十三〉(E♭maj9)、Daniel Caesar、Bruno Major——你 R&B 軸的全部。",
-   plays:[ {label:"🔊 Cmaj7(甜)", spell:"C E G B", notes:[48,52,55,59], mode:"chord"},
-           {label:"🔊 → Cmaj9(甜上加甜)", spell:"C E G B D", notes:[48,52,55,59,62], mode:"chord"} ] },
+   plays:[ {label:"Cmaj7(甜)", spell:"C E G B", notes:[48,52,55,59], mode:"chord"},
+           {label:"→ Cmaj9(甜上加甜)", spell:"C E G B D", notes:[48,52,55,59,62], mode:"chord"} ] },
  { sym:"D 大 ↔ B 小", t:"關係小調:同一把音,兩個家",
    body:"D 大調和 B 小調用「一模一樣的七個音」,差別只在「哪個音是家」:回到 D = 明亮的家;回到 B = 憂鬱的家。這叫關係小調(relative minor)。注意跟第 4 章分清楚:「平行」= 同根音不同音(D大↔D小,借和弦用);「關係」= 同一把音不同家(D大↔B小,換心情用)。",
    song:"seasons 在 D 大調,它的關係小調就是 B 小調——同一把音,把家搬到 B,整首就憂鬱了。",
-   plays:[ {label:"🔊 同一把音,回到 D = 亮的家", spell:"D E F♯ G A B C♯ → D", notes:[50,52,54,55,57,59,61,62], mode:"melody"},
-           {label:"🔊 同一把音,回到 B = 暗的家", spell:"B C♯ D E F♯ G A → B", notes:[47,49,50,52,54,55,57,59], mode:"melody"} ] },
+   plays:[ {label:"同一把音,回到 D = 亮的家", spell:"D E F♯ G A B C♯ → D", notes:[50,52,54,55,57,59,61,62], mode:"melody"},
+           {label:"同一把音,回到 B = 暗的家", spell:"B C♯ D E F♯ G A → B", notes:[47,49,50,52,54,55,57,59], mode:"melody"} ] },
  { sym:"I · IV · V …", t:"度數食譜:羅馬數字 = 換調自由",
    body:"和弦用「在音階第幾度」命名(I、IV、V…),大寫=大三、小寫=小三。記度數、不記和弦名,就能把同一首歌搬到任何適合你嗓子的調。",
    song:"seasons = Imaj7–I7–IVmaj7–iv6。Dreamer 跟它「同一招」,就是因為度數一樣(Imaj7→IVmaj7→iv6),只是音不同。",
-   plays:[ {label:"🔊 seasons 全段", spell:"Dmaj7 → D7 → Gmaj7 → Gm6", chords:[[50,54,57,61],[50,54,57,60],[55,59,62,66],[55,58,62,64]]} ] },
+   plays:[ {label:"seasons 全段", spell:"Dmaj7 → D7 → Gmaj7 → Gm6", chords:[[50,54,57,61],[50,54,57,60],[55,59,62,66],[55,58,62,64]]} ] },
  { sym:"I · V · vi · IV", t:"口袋四和弦:認得這個 loop,半張歌單會彈",
    body:"同樣四個和弦(I、IV、V、vi),換一個起點,就是一首新歌的情緒:從 vi 起(Moonbeam)= 先憂鬱再放晴;從 IV 起(blue)= 日系那種輕輕轉個彎。你不用記和弦名,記「度數的順序」就好——這就是為什麼這麼多歌你一聽就會跟著哼:它們其實是同一個 loop 在轉。",
    song:"Johnny Stimson〈Moonbeam〉(vi–IV–V–I)、yung kai〈blue〉(IV–V–I–vi)、Gustixa〈Melancholy〉、Pink Sweat$〈At My Worst〉——同一個圈,不同起點。",
-   plays:[ {label:"🔊 vi–IV–V–I(Moonbeam:憂鬱起、明亮收)", spell:"Em–C–D–G", chords:[[52,55,59],[48,52,55],[50,54,57],[55,59,62]]},
-           {label:"🔊 IV–V–I–vi(blue:日系轉個彎)", spell:"A–B–E–C♯m", chords:[[57,61,64],[59,63,66],[52,56,59],[49,52,56]]} ] }
+   plays:[ {label:"vi–IV–V–I(Moonbeam:憂鬱起、明亮收)", spell:"Em–C–D–G", chords:[[52,55,59],[48,52,55],[50,54,57],[55,59,62]]},
+           {label:"IV–V–I–vi(blue:日系轉個彎)", spell:"A–B–E–C♯m", chords:[[57,61,64],[59,63,66],[52,56,59],[49,52,56]]} ] }
 ];
 let thIdx=0;
 function theorySound(spec, btn){
@@ -904,8 +917,8 @@ function renderTheory(){
   $("thPage").textContent=(thIdx+1)+" / "+THEORY.length;
   if($("thJump")) $("thJump").value=thIdx;
   $("thSym").textContent=c.sym; $("thTitle").textContent=c.t; $("thBody").textContent=c.body;
-  $("thSong").textContent="🎵 你的歌:"+c.song;
-  $("thPlays").innerHTML=c.plays.map((p,i)=>'<div class="tplaywrap"><button class="tplay" data-i="'+i+'">'+p.label+'</button>'+(p.spell?'<span class="tspell">'+p.spell+'</span>':'')+'</div>').join("");
+  $("thSong").textContent="你的歌:"+c.song;
+  $("thPlays").innerHTML=c.plays.map((p,i)=>'<div class="tplaywrap"><button class="tplay" data-i="'+i+'">'+IC.spk+'<span>'+p.label+'</span></button>'+(p.spell?'<span class="tspell">'+p.spell+'</span>':'')+'</div>').join("");
   $("thPlays").querySelectorAll(".tplay").forEach(b=>b.onclick=()=>theorySound(c.plays[+b.dataset.i], b));
   $("thPrev").style.visibility=thIdx>0?"visible":"hidden";
   $("thNext").textContent= thIdx<THEORY.length-1 ? "下一個 ▶" : "↺ 從頭再看";
@@ -926,9 +939,9 @@ async function startMic(){
     analyser=audioCtx.createAnalyser(); analyser.fftSize=2048; buf=new Float32Array(analyser.fftSize); src.connect(analyser);
     micOn=true; micBtn.textContent="■ 關麥克風"; micBtn.classList.add("on"); statusEl.textContent="聽到你了 · LISTENING"; micAttn();
     if(!rafId) loop();
-  }catch(e){ statusEl.className="status err"; statusEl.textContent="麥克風打不開："+(e&&e.name?e.name:e)+"。file:// 權限問題就跟我說，用 localhost。"; micOn=false; micBtn.textContent="🎤 開麥克風"; micBtn.classList.remove("on"); }
+  }catch(e){ statusEl.className="status err"; statusEl.textContent="麥克風打不開："+(e&&e.name?e.name:e)+"。file:// 權限問題就跟我說，用 localhost。"; micOn=false; micBtn.textContent="開麥克風"; micBtn.classList.remove("on"); }
 }
-function stopMic(){ micOn=false; if(rafId) cancelAnimationFrame(rafId); rafId=null; gameActive=false; if(micStream) micStream.getTracks().forEach(t=>t.stop()); micBtn.textContent="🎤 開麥克風"; micBtn.classList.remove("on"); statusEl.textContent="已停止 · STOPPED"; micAttn(); noteBig.classList.remove("live"); noteBig.textContent="—"; hzEl.textContent="— Hz"; }
+function stopMic(){ micOn=false; if(rafId) cancelAnimationFrame(rafId); rafId=null; gameActive=false; if(micStream) micStream.getTracks().forEach(t=>t.stop()); micBtn.textContent="開麥克風"; micBtn.classList.remove("on"); statusEl.textContent="已停止 · STOPPED"; micAttn(); noteBig.classList.remove("live"); noteBig.textContent="—"; hzEl.textContent="— Hz"; }
 micBtn.onclick=()=>micOn?stopMic():startMic();
 
 /* ===================== game: arcade scoring ===================== */
@@ -955,10 +968,12 @@ function endRun(){
   const grade = perf>=95?"S":perf>=80?"A":perf>=65?"B":perf>=45?"C":"D";
   const msgs={S:"PERFECT PITCH. 你的耳朵跟嗓子同一條線。",A:"很穩。再快一點？",B:"抓到感覺了，多幾輪更準。",C:"放慢速度，把音聽清楚再唱。",D:"降速度、開提示音，一個音一個音來。"};
   $("egGrade").textContent=grade;
+  const pid=$("patSel").value, prevBest=(RPG.best&&RPG.best[pid])||0, isPB=score>prevBest&&score>0;
+  if(isPB){ RPG.best=RPG.best||{}; RPG.best[pid]=score; }
   const xpGained=awardRound(perf, score);
   $("egStat").innerHTML="SCORE <b>"+score+"</b> · "+hitCount+"/"+scTotal+" 命中 ("+perf+"%) · <b>+"+xpGained+" XP</b>";
-  $("egMsg").textContent=msgs[grade]+(canLevelUp()?"　🎭 可升級！點上方 Bard 條":"");
-  endScreen.classList.add("show"); sfxEnd();
+  $("egMsg").innerHTML=(isPB?'<b>★ 新高分!</b>　':(prevBest?'你的最佳:'+prevBest+'　':''))+msgs[grade]+(canLevelUp()?"　可升級!點上方 Bard 條":"");
+  endScreen.classList.add("show"); sfxEnd(); if(isPB) setTimeout(()=>sfxCombo(8),260);
   if($("autoChk").checked) setTimeout(()=>{ if(!gameActive) startRun(); }, 1900);
 }
 goBtn.onclick=()=>{ if(gameActive){ gameActive=false; endScreen.classList.remove("show"); goBtn.textContent="▶ START"; goBtn.classList.remove("stop"); } else openDeck(); };
@@ -994,7 +1009,7 @@ const BARD_LV=[
   {n:"宗師",toNext:Infinity,ms:"≈ 12 個月 — 聲音有辨識度，表演不再是障礙。"}
 ];
 let RPG=loadRPG(), eggActive=false;
-function loadRPG(){ try{ return Object.assign({xp:0,level:1,streak:0,lastDay:null,stars:{},learned:[],earCorrect:0,earBest:0}, JSON.parse(localStorage.getItem(RPGKEY))||{}); }catch(e){ return {xp:0,level:1,streak:0,lastDay:null,stars:{},learned:[],earCorrect:0,earBest:0}; } }
+function loadRPG(){ try{ return Object.assign({xp:0,level:1,streak:0,lastDay:null,stars:{},learned:[],earCorrect:0,earBest:0,best:{}}, JSON.parse(localStorage.getItem(RPGKEY))||{}); }catch(e){ return {xp:0,level:1,streak:0,lastDay:null,stars:{},learned:[],earCorrect:0,earBest:0,best:{}}; } }
 function saveRPG(){ try{ localStorage.setItem(RPGKEY, JSON.stringify(RPG)); }catch(e){} }
 function lvInfo(){ return BARD_LV[Math.min(RPG.level-1, BARD_LV.length-1)]; }
 function toNext(){ return lvInfo().toNext; }
@@ -1011,7 +1026,7 @@ function awardRound(perf, sc){
 }
 function totalStars(){ var s=0; for(var k in RPG.stars) s+=RPG.stars[k]; return s; }
 function renderChip(){
-  $("bcLv").textContent="Lv."+RPG.level; $("bcTitle").textContent=lvInfo().n; $("bcStreak").textContent="🔥"+(RPG.streak||0);
+  $("bcLv").textContent="Lv."+RPG.level; $("bcTitle").textContent=lvInfo().n; $("bcIc").innerHTML=IC.face; $("bcStreak").innerHTML=IC.flame+(RPG.streak||0);
   $("bcXpFill").style.width=(toNext()===Infinity?100:Math.min(100,RPG.xp/toNext()*100))+"%";
   $("bardChip").classList.toggle("ready", canLevelUp());
   $("bcStreak").classList.toggle("hot",(RPG.streak||0)>0);
@@ -1020,7 +1035,7 @@ function chipGain(){ const ch=$("bardChip"); ch.classList.remove("gain"); void c
 function renderScreen(){
   const lv=lvInfo();
   $("bsChar").innerHTML = eggActive ? catSVG() : bardSVG(RPG.level);
-  $("bsName").textContent = eggActive ? "野生酷貓 🕶️" : lv.n;
+  $("bsName").textContent = eggActive ? "野生酷貓" : lv.n;
   $("bsLv").innerHTML="lv. "+RPG.level+" <span>("+RPG.xp+" exp)</span>";
   const need=toNext(); $("bsXpFill").style.width=(need===Infinity?100:Math.min(100,RPG.xp/need*100))+"%";
   $("bsXpLo").textContent="0 exp"; $("bsXpHi").textContent=(need===Infinity?"MAX":need+" exp");
@@ -1158,7 +1173,7 @@ function draw(){
       g.fillStyle="rgba(22,21,15,.8)"; g.font="800 54px 'Bricolage Grotesque','PingFang TC',sans-serif";
       g.fillText(mode==="game"?"♪ 選一首歌，唱給我聽":"♪ 哼一個音，鏡子跟著你",W/2,H/2-26);
       g.fillStyle="rgba(22,21,15,.48)"; g.font="22px 'Space Mono','PingFang TC',monospace";
-      g.fillText(mode==="game"?"🎤 開麥克風 → 選音型 → ▶ START（或按空白鍵）":"🎤 開麥克風就開始",W/2,H/2+26);
+      g.fillText(mode==="game"?"開麥克風 → 選音型 → ▶ START（或按空白鍵）":"開麥克風就開始",W/2,H/2+26);
     } else if(mode==="game"){
       g.fillStyle="rgba(22,21,15,.42)"; g.font="700 26px 'Space Mono',monospace";
       g.fillText("READY — ▶ START 或按空白鍵",W/2,52);
