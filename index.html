@@ -1055,27 +1055,34 @@ $("bsLevelUp").onclick=()=>{ if(!canLevelUp())return; RPG.xp-=toNext(); RPG.leve
     card.appendChild(c); setTimeout(()=>c.remove(),1500); } };
 /* Humation-style 塗鴉角色,髮型/配件隨等級變 */
 function bardSVG(level){
-  const look = level<=2?0 : level<=4?1 : level<=6?2 : 3;
-  const hairs=[
-    '<g fill="#16150f" stroke="none"><circle cx="60" cy="48" r="13"/><circle cx="80" cy="40" r="16"/><circle cx="100" cy="48" r="13"/><circle cx="80" cy="46" r="17"/></g>',
-    '<g fill="#16150f" stroke="none"><circle cx="54" cy="50" r="14"/><circle cx="70" cy="36" r="15"/><circle cx="90" cy="36" r="15"/><circle cx="106" cy="50" r="14"/><circle cx="80" cy="42" r="18"/></g>',
-    '<g fill="#16150f" stroke="none"><circle cx="62" cy="46" r="11"/><circle cx="76" cy="38" r="12"/><circle cx="92" cy="42" r="11"/><circle cx="84" cy="35" r="10"/><circle cx="70" cy="44" r="10"/></g>',
-    '<g fill="#16150f" stroke="none"><circle cx="50" cy="50" r="14"/><circle cx="64" cy="34" r="15"/><circle cx="80" cy="28" r="16"/><circle cx="96" cy="34" r="15"/><circle cx="110" cy="50" r="14"/><circle cx="80" cy="40" r="19"/></g>'
-  ];
-  let acc="";
-  if(level>=7) acc+='<path d="M66 20 L72 8 L80 18 L88 8 L94 20" fill="none" stroke="#16150f" stroke-width="3" stroke-linejoin="round"/>';
-  const notes='<g font-family="Georgia,serif" font-size="20" fill="#16150f" stroke="none"><text x="14" y="74">♪</text><text x="130" y="60">♫</text>'+(level>=4?'<text x="16" y="122">♬</text>':'')+'</g>';
-  return '<svg viewBox="0 0 160 200" width="150" height="188">'+
-    '<g filter="url(#rough)">'+
-    '<path d="M48 198 Q44 152 66 118 L73 110 Q80 120 87 110 L94 118 Q116 152 112 198 Z" fill="#fffefb" stroke="#16150f" stroke-width="3" stroke-linejoin="round"/>'+
-    '<path d="M73 110 L80 124 L87 110" fill="none" stroke="#16150f" stroke-width="3" stroke-linejoin="round"/>'+
-    '<path d="M73 88 L73 112 M87 88 L87 112" fill="none" stroke="#16150f" stroke-width="3"/>'+
-    hairs[look]+
-    '<ellipse cx="80" cy="64" rx="25" ry="27" fill="#fffefb" stroke="#16150f" stroke-width="3"/>'+
-    acc+'</g>'+
-    '<circle cx="71" cy="62" r="3" fill="#16150f"/><circle cx="89" cy="62" r="3" fill="#16150f"/>'+
-    '<ellipse cx="80" cy="76" rx="3.5" ry="5" fill="none" stroke="#16150f" stroke-width="2.5"/>'+
-    notes+'</svg>';
+  const I="#16150f", P="#fffefb", SW='stroke="'+I+'" stroke-width="3" stroke-linejoin="round"',
+        look=level<=2?0:level<=4?1:level<=6?2:3;
+  // 實心黑髮(per level)
+  const hair=[
+    'M54 90 Q47 50 80 47 Q113 50 106 90 Q96 66 80 64 Q64 66 54 90 Z',
+    'M52 92 Q43 47 64 45 Q72 34 80 44 Q88 34 96 45 Q117 47 108 92 Q97 63 80 62 Q63 63 52 92 Z',
+    'M55 88 Q50 50 72 47 Q80 39 89 47 Q110 50 105 88 Q95 63 80 62 Q65 63 55 88 Z',
+    'M50 92 Q39 43 63 43 Q72 29 80 41 Q88 29 97 43 Q121 43 110 92 Q97 61 80 60 Q63 61 50 92 Z'
+  ][look];
+  let acc='';
+  if(level>=4) acc='<path d="M53 86 Q80 56 107 86" fill="none" stroke="'+I+'" stroke-width="3.5"/><ellipse cx="52" cy="92" rx="6.5" ry="9.5" fill="'+I+'"/><ellipse cx="108" cy="92" rx="6.5" ry="9.5" fill="'+I+'"/>'; // 耳機
+  if(level>=7) acc+='<path d="M63 41 L70 26 L80 38 L90 26 L97 41" fill="none" '+SW+'/>'; // 皇冠
+  const body=
+    '<path d="M40 196 Q34 147 64 129 Q80 121 96 129 Q126 147 120 196 Z" fill="'+I+'" '+SW+'/>'+            // 抱膝(黑褲)
+    '<path d="M51 196 Q49 185 62 185 Q75 185 74 196 Z" fill="'+I+'"/><path d="M51 195 H74" stroke="'+P+'" stroke-width="3"/>'+  // 鞋
+    '<path d="M86 196 Q85 185 98 185 Q111 185 109 196 Z" fill="'+I+'"/><path d="M86 195 H109" stroke="'+P+'" stroke-width="3"/>'+
+    '<path d="M62 121 Q56 110 69 108 L91 108 Q104 110 98 121 L103 151 Q80 143 57 151 Z" fill="'+I+'" '+SW+'/>'+  // T 恤
+    '<path d="M46 151 Q80 137 114 151 Q117 161 106 162 Q80 151 54 162 Q43 161 46 151 Z" fill="'+P+'" '+SW+'/>'+  // 手臂環膝(膚)
+    '<path d="M73 108 L73 99 M87 108 L87 99" '+SW+'/>'+                                                          // 脖子
+    '<ellipse cx="80" cy="85" rx="24" ry="26" fill="'+P+'" '+SW+'/>'+                                            // 頭
+    hair;
+  const face=
+    '<g fill="none" stroke="'+I+'" stroke-width="2.6"><circle cx="71" cy="87" r="7.6"/><circle cx="89" cy="87" r="7.6"/><path d="M78.6 87 H81.4"/><path d="M63.4 85 Q60 83 57 85"/><path d="M96.6 85 Q100 83 103 85"/></g>'+ // 圓框眼鏡
+    '<g fill="'+I+'"><circle cx="71" cy="87" r="2.5"/><circle cx="89" cy="87" r="2.5"/></g>'+                    // 眼
+    '<path d="M80 94 L80 99" stroke="'+I+'" stroke-width="2.3"/>'+                                                // 鼻
+    '<ellipse cx="80" cy="104" rx="3" ry="3.6" fill="'+P+'" stroke="'+I+'" stroke-width="2.3"/>';               // 唱歌的嘴
+  const notes='<g font-family="Georgia,serif" font-size="19" fill="'+I+'"><text x="17" y="74">♪</text><text x="129" y="62">♫</text>'+(level>=4?'<text x="21" y="126">♬</text>':'')+'</g>';
+  return '<svg viewBox="0 0 160 200" width="150" height="188"><g filter="url(#rough)">'+body+acc+'</g>'+face+notes+'</svg>';
 }
 /* 彩蛋:酷貓 */
 function catSVG(){
