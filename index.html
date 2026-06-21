@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PITCH BARD · 練唱</title>
-<meta name="description" content="PITCH BARD — AJ 的黑白塗鴉練唱 RPG:跟著唱、自由鏡、聽辨、樂理講解。" />
+<title>後半夜 · after hours</title>
+<meta name="description" content="後半夜 / after hours — 黑白塗鴉的練唱本:跟著唱、自由鏡、聽辨、樂理,從你愛的歌長出來。" />
 <meta name="theme-color" content="#faf8f3" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='3' y='3' width='58' height='58' rx='14' fill='%23faf8f3' stroke='%2316150f' stroke-width='4'/%3E%3Ctext x='32' y='47' font-size='40' text-anchor='middle' fill='%2316150f' font-family='Georgia'%3E%E2%99%AA%3C/text%3E%3C/svg%3E" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='3' y='3' width='58' height='58' rx='14' fill='%23faf8f3' stroke='%2316150f' stroke-width='4'/%3E%3Ccircle cx='30' cy='34' r='16' fill='%2316150f'/%3E%3Ccircle cx='38' cy='29' r='13' fill='%23faf8f3'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
@@ -33,7 +33,8 @@
   @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 
   header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; }
-  h1 { font-family: var(--display); font-weight: 800; font-size: 30px; letter-spacing: -.5px; line-height: .95; }
+  h1 { font-family: var(--display); font-weight: 800; font-size: 31px; letter-spacing: -.5px; line-height: .95; }
+  .h1en { font-weight: 600; font-size: .56em; color: var(--ink2); letter-spacing: .5px; }
   .kicker { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink2); margin-bottom: 8px; }
   .sub { font-family: var(--mono); color: var(--ink2); font-size: 11.5px; margin-top: 7px; letter-spacing: .3px; }
   select { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 11px; padding: 9px 13px; font-size: 13px; font-family: var(--mono); cursor: pointer; }
@@ -306,7 +307,7 @@
   <header>
     <div>
       <div class="kicker">練唱 · 聽辨 · 樂理</div>
-      <h1>音準鏡 / PITCH BARD</h1>
+      <h1>後半夜 <span class="h1en">/ after hours</span></h1>
       <div class="sub" id="tagline">一串音往你這邊跑來，唱準它。 <span class="cur">_</span></div>
     </div>
     <select id="keySel">
@@ -697,7 +698,7 @@ function playBacking(ci, when){
   brush(pos%4===0, when);
 }
 
-/* ===================== 聽力練習 (ear training) — 折進 PITCH BARD,共用 softTone + Bard XP ===================== */
+/* ===================== 聽力練習 (ear training) — 折進主程式,共用 softTone + Bard XP ===================== */
 /* kind: chord=單和弦聽質地 | interval=兩個音的距離 | pair=前後對照(嘆氣偵測) | prog=整段進行 */
 const EAR_LEVELS={
   basic:{ name:"大調 / 小調", kind:"chord", choices:[
